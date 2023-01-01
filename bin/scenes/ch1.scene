@@ -1,0 +1,68 @@
+c = plane(vec3(0, 0, 1), -10, MtlLib[6]);
+
+//create body;
+b1 = ellipsoid(vec3(0), vec3(4, 5, 4), MtlLib[2]);
+b2 = sphere(vec3(0, -1, 0.3), 4, MtlLib[1]);
+body = smth_union(b1, b2, 1);
+
+//create horns;
+h1 = cylinder(vec3(0, 4.5, 0), 0.3, vec3(0, 5.5, 0), 0.002, MtlLib[20]);
+h1 = rotate(h1, vec3(0, 0, 1), 30);
+h2 = rotate(h1, vec3(0, 0, 1), -30);
+body = smth_union(h1, body, 0.1);
+body = smth_union(h2, body, 0.1);
+
+//create legs;
+l1 = capsule(vec3(-1,  -5, 0), vec3(-1, -7, 0), 0.5, MtlLib[3]);
+l3 = ellipsoid(vec3(-1, -7, 0.9), vec3(0.6, 0.4, 0.4), MtlLib[7]);
+l1 = smth_union(l1, l3, 1);
+
+
+body = smth_union(l1, body, 1);
+l2 = capsule(vec3(1, -5, 0), vec3(1, -7, 0), 0.5, MtlLib[3]);
+l4 = ellipsoid(vec3(1, -7, 0.9), vec3(0.6, 0.4, 0.4), MtlLib[7]);
+l2 = smth_union(l2, l4, 1);
+body = smth_union(l2, body, 1);
+
+//create mouth;
+m = capsule(vec3(-1, 2.8, 3.), vec3(1, 2.8, 3.), 0.5, MtlLib[2]);
+body = smth_dif(body, m, 0.);
+
+//create teeth;
+t1 = cylinder(vec3(-0.8, 2.5, 3), 0.3, vec3(-0.8, 2.7, 3), 0.15, MtlLib[20]);
+t1 = rotate(t1, vec3(0, 0, 1), 2);
+body = smth_union(body, t1, 0);
+t2 = cylinder(vec3(0.5, 2.5, 3), 0.3, vec3(0.5, 2.8, 3), 0.15, MtlLib[20]);
+t2 = rotate(t2, vec3(0, 0, 1), -5);
+body = smth_union(body, t2, 0);
+
+//create eyes;
+e1 = sphere(vec3(-1.3, 3.5, 2.5), 0.15, MtlLib[18]);
+e2 = sphere(vec3(1.3, 3.5, 2.5), 0.15, MtlLib[18]);
+body = smth_union(body, e1, 0);
+body = smth_union(body, e2, 0);
+
+//create hands;
+hd1 = capsule(vec3(2., 2, 0), vec3(5.5, -2, 0), 0.9, MtlLib[2]);
+f1 = sphere(vec3(6, -2., 0.7), 0.2, MtlLib[2]);
+hd1 = smth_union(hd1, f1, 1);
+f1 = sphere(vec3(5.3, -2.9, 0), 0.2, MtlLib[2]);
+hd1 = smth_union(hd1, f1, 1);
+body = smth_union(hd1, body, 0.8);
+
+hd2 = capsule(vec3(-2., 2, 0), vec3(-5.5, -2, 0), 0.9, MtlLib[2]);
+f2 = sphere(vec3(-6, -2., 0.7), 0.2, MtlLib[2]);
+hd2 = smth_union(hd2, f2, 1);
+f2 = sphere(vec3(-5.3, -2.9, 0), 0.2, MtlLib[2]);
+hd2 = smth_union(hd2, f2, 1);
+body = smth_union(hd2, body, 0.8);
+
+
+Scene << c << body;
+
+l = point_light(vec3(13, 8, 8), vec3(1, 1, 1));
+s = point_light(vec3(-13, 8, 8), vec3(1, 0.5, 1));
+d = dir_light(vec3(0, 0, 1), vec3(0.4));
+Scene << d;                                             
+d = dir_light(vec3(0, 0, -1), vec3(0.4));
+Scene << d;                                           	

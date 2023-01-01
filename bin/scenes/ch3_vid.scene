@@ -1,0 +1,60 @@
+c = plane(vec3(0, 1, 0), 1.2, MtlLib[6]);
+
+body = capsule(vec3(0, 4, -0.75), vec3(0, 4, 0.75), 0.6, MtlLib[22]);
+body = rotate(body, vec3(0, 1, 0), Time * 10);
+
+l1 = capsule(vec3(-0.5, 3.5, 1.55), vec3(-1, 1.8, 2.15), 0.6, MtlLib[22]);
+l1 = rotate(l1, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l1, abs(sin(Time * 0.4)));
+
+l2 = capsule(vec3(0.5, 3.5, 1.55), vec3(1, 1.8, 2.15), 0.6, MtlLib[22]);
+l2 = rotate(l2, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l2, abs(sin(Time * 0.8)));
+
+l3 = capsule(vec3(0.5, 3.5, -1.45), vec3(1, 1.8, -2.25), 0.6, MtlLib[22]);
+l3 = rotate(l3, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l3, abs(sin(Time * 0.4)));
+
+l4 = capsule(vec3(-0.5, 3.5, -1.45), vec3(-1, 1.8, -2.25), 0.6, MtlLib[22]);
+l4 = rotate(l4, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l4, abs(sin(Time * 0.4)));
+
+l5 = capsule(vec3(0., 4.3, -1.72), vec3(0, 5, -2.25), 0.4, MtlLib[22]);
+l5 = rotate(l5, vec3(0, 1, 0), Time * 10);
+l6 = capsule(vec3(0, 5.3, -2.45), vec3(0, 5.45, -2.6), 0.1, MtlLib[22]);
+l6 = rotate(l6, vec3(0, 1, 0), Time * 10);
+
+l5 = smth_union(l5, l6, 0.1 + abs(sin(Time * 0.4)));
+body = smth_union(body, l5, abs(sin(Time * 0.4)));
+
+l7 = capsule(vec3(0., 4.25, 1.55), vec3(0, 5, 1.75), 0.4, MtlLib[22]);
+l7 = rotate(l7, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l7, abs(sin(Time * 0.4)));
+
+l8 = capsule(vec3(0, 5.8, 1.95), vec3(0, 6., 3.25), 0.5, MtlLib[22]);
+l8 = rotate(l8, vec3(0, 1, 0), Time * 10);
+l9 = capsule(vec3(0, 6., 3.55), vec3(0, 6.1, 3.9), 0.1, MtlLib[22]);
+l9 = rotate(l9, vec3(0, 1, 0), Time * 10);
+l8 = smth_union(l8, l9, 0.1);
+
+l10 = torus(vec3(0, 6.13, 4), vec3(0, 0.15, -1.25), 0.1, 0.01, MtlLib[22]);
+l10 = rotate(l10, vec3(0, 1, 0), Time * 10);
+
+l8 = smth_union(l8, l10, 0.1 + abs(sin(Time * 0.4)));
+body = smth_union(body, l8, abs(sin(Time * 0.4)));
+
+l11 = capsule(vec3(0.4, 6.5, 1.95), vec3(0.6, 7.2, 1.95), 0.3, MtlLib[22]);
+l11 = rotate(l11, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l11, abs(sin(Time * 0.4)));
+
+l12 = capsule(vec3(-0.4, 6.5, 1.95), vec3(-0.6, 7.2, 1.95), 0.3, MtlLib[22]);
+l12 = rotate(l12, vec3(0, 1, 0), Time * 10);
+body = smth_union(body, l12, abs(sin(Time * 0.4)));
+
+Scene << c << body;
+
+l = point_light(vec3(13, 8, 8), vec3(1, 1, 1));
+s = point_light(vec3(-5, 10 + sin(Time), 8), vec3(0.8, 0.5, 1));
+
+d = dir_light(vec3(0.2, 0.2, 1), vec3(0.3));
+Scene << s;                                                     

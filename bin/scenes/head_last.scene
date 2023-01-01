@@ -1,0 +1,116 @@
+c = plane(vec3(0, 0, 1), -10, MtlLib[6], "CGSG.jpg");
+
+//create head;
+h1 = ellipsoid(vec3(0, 4, 0.), vec3(4.5, 5, 5), MtlLib[16]);
+h2 = ellipsoid(vec3(0, 2, 1), vec3(3.5, 4.2, 4), MtlLib[16]);
+head = smth_union(h1, h2, 1);
+
+//create tail;
+tail = cylinder(vec3(0, 0, -0.5), 2, vec3(0, -7.8, 0.5), 2, MtlLib[16]);
+//tail = ellipsoid(vec3(0, -5, -0.5), vec3(2, 4, 2), MtlLib[16]);
+t1 = ellipsoid(vec3(-4, -7, -0.5), vec3(3, 2, 2), MtlLib[16]);
+t2 = ellipsoid(vec3(4, -7, -0.5), vec3(3, 2, 2), MtlLib[16]);
+tail = smth_union(t1, tail, 1);
+tail = smth_union(t2, tail, 1);
+head = smth_union(head, tail, 0.6);
+
+//create brows;
+b1 = torus(vec3(-2., 4.2, 4.35), vec3(0, 0, 1), 1.4, 0.1, MtlLib[19]);
+b1 = translate(b1, vec3(2., -4.2, -4.35));
+b1 = rotate(b1, vec3(0, 1, 0), -20);
+b1 = translate(b1, vec3(-2., 4.2, 4.35));
+b3 = box(vec3(-2., 3.8, 4.2), vec3(1.5), MtlLib[19]);
+b1 = dif(b1, b3);
+b2 = torus(vec3(2., 4.2, 4.35), vec3(0, 0, 1), 1.4, 0.1, MtlLib[19]);
+b2 = translate(b2, vec3(-2., -4.2, -4.35));
+b2 = rotate(b2, vec3(0, 1, 0), 20);
+b2 = translate(b2, vec3(2., 4.2, 4.35));
+b4 = box(vec3(2., 3.8, 4.2), vec3(1.5), MtlLib[19]);
+b2 = dif(b2, b4);
+head = union(head, b1);
+head = union(head, b2);
+
+//create eyes;
+e1 = sphere(vec3(-2.5, 4.2, 5.8), 1.3, MtlLib[10]);
+e2 = sphere(vec3(2.5, 4.2, 5.8), 1.3, MtlLib[10]);
+head = smth_dif(head, e1, 1);
+head = smth_dif(head, e2, 1);
+eye1 = sphere(vec3(-1.9, 4.2, 4.8), 0.8, MtlLib[20]);
+eye2 = sphere(vec3(1.9, 4.2, 4.8), 0.8, MtlLib[20]);
+head = smth_dif(head, eye1, 0.4);
+head = smth_dif(head, eye2, 0.4);
+eye1 = sphere(vec3(-1.8, 4.2, 3.65), 1, MtlLib[20]);
+eye2 = sphere(vec3(1.8, 4.2, 3.65), 1, MtlLib[20]);
+
+l1 = hollow_sphere(vec3(-1.8, 4.2, 3.65), 1.01, 0.01, 0., MtlLib[16]);
+l1 = translate(l1, vec3(1.8, -4.2, -3.65));
+l1 = rotate(l1, vec3(0, 1, 0), -10);
+l1 = rotate(l1, vec3(1, 0, 0), (-sin(Time * 2) * 10) > 0 ? abs(cos(Time * 2)) * 10 : 10);
+l1 = translate(l1, vec3(-1.8, 4.2, 3.65));
+
+l2 = translate(l1, vec3(1.8, -4.2, -3.65));
+l2 = rotate(l2, vec3(1, 0, 0), 170);
+l2 = rotate(l2, vec3(1, 0, 0), (sin(Time * 2) * 40) < 0 ? -abs(cos(Time * 2)) * 10 : -10);
+l2 = translate(l2, vec3(-1.8, 4.2, 3.65));
+
+eye1 = union(l1, eye1);
+eye1 = union(l2, eye1);
+
+//z1 = ellipsoid(vec3(-1.85, 4.2, 4.55), vec3(0.4, 0.4, 0.2), MtlLib[9]);
+//z2 = ellipsoid(vec3(1.85, 4.2, 4.55), vec3(0.4, 0.4, 0.2), MtlLib[9]);
+//z3 = ellipsoid(vec3(-1.85, 4.2, 4.56), vec3(0.3, 0.3, 0.2), MtlLib[18]);
+//z4 = ellipsoid(vec3(1.85, 4.2, 4.56), vec3(0.3, 0.3, 0.2), MtlLib[18]);
+//z1 = union(z1, z3);
+//z2 = union(z2, z4);
+//eye1 = union(eye1, z1);
+//eye2 = union(eye2, z2);
+
+head = union(head, eye1);
+head = union(head, eye2);
+
+//create nose;
+nose = ellipsoid(vec3(0, 3.9 - 0.3, 5.2), vec3(0.4, 1.2, 0.3), MtlLib[16]);
+nose = translate(nose, vec3(0, -3.9 + 0.3, -5.2));
+nose = rotate(nose, vec3(1, 0, 0), -20);
+nose = translate(nose, vec3(0, 3.9 - 0.3, 5.2));
+n1 = sphere(vec3(-0.4, 3. - 0.3, 5.2), 0.25, MtlLib[16]);
+n2 = sphere(vec3(0.4, 3. - 0.3, 5.2), 0.25, MtlLib[16]);
+n3 = sphere(vec3(-0.35, 2.5 - 0.3, 5.27), 0.25, MtlLib[16]);
+n4 = sphere(vec3(0.35, 2.5 - 0.3, 5.27), 0.25, MtlLib[16]);
+nose = smth_union(nose, n1, 0.6);
+nose = smth_union(nose, n2, 0.6);
+nose = smth_dif(nose, n3, 0.1);
+nose = smth_dif(nose, n4, 0.1);
+head = smth_union(head, nose, 0.5);
+
+//create mouth;
+mouth = ellipsoid(vec3(0, 0.9, 4.6), vec3(1., 0.2, 0.5), MtlLib[16]);
+head = smth_dif(head, mouth, 0.);
+mouth = cylinder(vec3(-0.8, 1.5, 4.5), 0.05, vec3(0.8, 1.5, 4.5), 0.05, MtlLib[16]);
+head = smth_union(head, mouth, 0.8);
+m = sphere(vec3(0, 1.8, 5.35), 0.09, MtlLib[16]);
+head = smth_dif(head, m, 0.4);
+
+teeth = torus(vec3(0, 0.6, 3.4), vec3(0, 1, 0), 1.01, 0.3, MtlLib[20]);
+head = smth_union(head, teeth, 0.);
+
+m = torus(vec3(0, 0.8, 4.25), vec3(0, 1, 0), 1., 0.01, MtlLib[21]);
+m = translate(m, vec3(0, -0.8, -4.25));
+m = rotate(m, vec3(1, 0, 0), -40);
+m = translate(m, vec3(0, 0.8, 4.25));
+head = smth_union(head, m, 0.5);
+
+m2 = torus(vec3(0, 0.6, 3.8), vec3(0, 1, 0), 1., 0.05, MtlLib[21]);
+m2 = translate(m2, vec3(0, -0.6, -3.8));
+m2 = rotate(m2, vec3(1, 0, 0), 10);
+m2 = translate(m2, vec3(0, 0.6, 3.8));
+head = smth_union(head, m2, 0.5);
+
+Scene << c << head;
+
+l = point_light(vec3(13, 8, 8), vec3(1, 1, 1));
+s = point_light(vec3(-13, 8, 8), vec3(1, 0.5, 1));
+d = dir_light(vec3(0, 0, 1), vec3(0.4));
+Scene << d;
+d = dir_light(vec3(0, 0, -1), vec3(0.4));
+Scene << d;

@@ -1,0 +1,42 @@
+c = plane(vec3(0, 0, 1), -10, MtlLib[6], "CGSG.jpg");
+
+//create body;
+head = capsule(vec3(0), vec3(0, 4, 0), 8, MtlLib[9]);
+
+//create eyes;
+e1 = sphere(vec3(-3, 5, 6 + abs(cos(Time * 5)) * 0.5), 1.5 + abs(sin(Time * 5)) * 0.5, MtlLib[20]);
+z1 = sphere(vec3(-3.2, 5.2, 7+ abs(cos(Time * 5)) * 0.5), 0.5 + abs(sin(Time * 5)) * 0.5, MtlLib[18]);
+e1 = union(e1, z1);
+head = smth_dif(head, e1, 0.5);
+head = union(head, e1);
+e2 = sphere(vec3(3, 5, 6 + abs(sin(Time * 5)) * 0.5), 1.5 + abs(cos(Time * 5)) * 0.5, MtlLib[20]);
+z2 = sphere(vec3(3.2, 5.2, 7+ abs(sin(Time * 5)) * 0.5), 0.5 + abs(cos(Time * 5)) * 0.5, MtlLib[18]);
+e2 = union(e2, z2);
+head = smth_dif(head, e2, 0.5);
+head = union(head, e2);
+
+//create mouth;
+m = capsule(vec3(0, 0, 8), vec3(0, abs(sin(Time * 10)), 8), 2 + cos(Time) * 0.8, MtlLib[2]);
+head = smth_dif(head, m, 0.3);
+
+//create brows;
+b1 = torus(vec3(-3, 6 + abs(cos(Time * 5)) * 2, 8), vec3(0, 0, 1), 2, 0.2, MtlLib[18]);
+b2 = box(vec3(-3, 5.2 + abs(cos(Time * 5)) * 2, 8), vec3(3, 2.3, 2.3), MtlLib[18]);
+b1 = dif(b1, b2);
+head = union(b1, head);
+
+b1 = torus(vec3(3, 6 + abs(sin(Time * 5)) * 2, 8), vec3(0, 0, 1), 2, 0.2, MtlLib[18]);
+b2 = box(vec3(3, 5.2 + abs(sin(Time * 5)) * 2, 8), vec3(3, 2.3, 2.3), MtlLib[18]);
+b1 = dif(b1, b2);
+head = union(b1, head);
+
+//create sphere;
+s = sphere(vec3(sin(Time * 2) * 8, 2, -2), 9 + cos(Time * 2), MtlLib[10]);
+head = smth_union(head, s, 1);
+
+Scene << c << head;
+
+d = dir_light(vec3(0, 0, 1), vec3(0.4));
+Scene << d;                                             
+d = dir_light(vec3(0, 0, -1), vec3(0.4));
+Scene << d;                                           	

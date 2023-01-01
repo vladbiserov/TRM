@@ -1,0 +1,40 @@
+p = plane(vec3(0, 0, 1), -10, MtlLib[6]);
+
+h1 = capsule(vec3(0), vec3(0, 4, 0), 0.5, MtlLib[10]);
+h2 = sphere(vec3(0, 5, 0), 2, MtlLib[2]);
+h3 = sphere(vec3(0, 6, 3), 2, MtlLib[1]);
+h2 = smth_dif(h2, h3, 0.1);
+h3 = sphere(vec3(0, 5.3, 1), 1.2, MtlLib[20]);
+h2 = union(h2, h3);
+eye = smth_union(h2, h1, 1);          
+
+r1 = hollow_sphere(vec3(0, 5.3, 1), 1.21, 0.01, 0., MtlLib[1]);
+r1 = translate(r1, vec3(0, -5.3, -1));
+r1 = rotate(r1, vec3(1, 0, 0), (-sin(Time * 2) * 10) > 0 ? abs(cos(Time * 2)) * 30 : 30);
+r1 = translate(r1, vec3(0, 5.3, 1));
+
+r2 = translate(r1, vec3(0, -5.3, -1));
+r2 = rotate(r2, vec3(1, 0, 0), 170);
+r2 = rotate(r2, vec3(1, 0, 0), (sin(Time * 2) * 40) < 0 ? -abs(cos(Time * 2)) * 40 : -40);
+r2 = translate(r2, vec3(0, 5.3, 1));
+
+r = sphere(vec3(0, 5.3, 1), 1.2, MtlLib[20]);
+r = union(r, r1);
+r = union(r, r2);
+
+h2 = sphere(vec3(0, 5, 0), 2, MtlLib[2]);
+h3 = sphere(vec3(0, 6, 3), 2, MtlLib[1]);
+h2 = smth_dif(h2, h3, 0.1);
+h3 = sphere(vec3(0, 5.3, 1), 1.2, MtlLib[20]);
+h2 = union(h2, r);
+eye = smth_union(h2, h1, 1);          
+
+Scene << eye << p;
+
+l = point_light(vec3(13, 8, 8), vec3(1, 1, 1));
+s = point_light(vec3(-13, 8, 8), vec3(1, 0.5, 1));
+d = dir_light(vec3(0, 0, 1), vec3(0.4));
+Scene << d;                                             
+d = dir_light(vec3(0, 0, -1), vec3(0.4));
+Scene << d;                                           	
+
