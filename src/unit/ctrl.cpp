@@ -41,9 +41,6 @@ namespace trm
       mth::vec3<FLT> Dir = Ani->Camera.Dir;
       Dir.Y = 0;
 
-      if (Ani->KeysClick[27])
-        exit(30);
-
       if (Ani->MouseX != 0 && Ani->Keys[VK_LBUTTON])
       {
         Ani->Camera.At -= Ani->Camera.Loc;

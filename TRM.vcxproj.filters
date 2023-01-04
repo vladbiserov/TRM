@@ -162,6 +162,9 @@
     <ClInclude Include="src\utils\parser\objects\mods.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -226,5 +229,21 @@
     <None Include="bin\shaders\RT\vert.glsl">
       <Filter>Source Files\Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\trm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cgsg.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pml30.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="res\TRM.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

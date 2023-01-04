@@ -76,7 +76,7 @@ struct ray
   vec3 Dir;
 };
 
-class envi
+struct envi
 {
   float RefractionCoef;
   float DecayCoef;

@@ -42,6 +42,11 @@ private:
 
 public:
   /* Class constructor */
+  error_log( VOID )
+  {
+  } /* End of 'error_log' function */
+
+  /* Class constructor */
   error_log(const std::string& FileName) : ErrFileName(FileName)
   {
   } /* End of 'error_log' function */

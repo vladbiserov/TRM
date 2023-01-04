@@ -27,6 +27,9 @@ bool parser::ReadFile(void)
 {
   std::ifstream File(SceneIn);
 
+  TCHAR NPath[MAX_PATH];
+  GetCurrentDirectory(MAX_PATH, NPath);
+
   if (File.is_open())
   {
     std::string Tmp;
@@ -38,6 +41,8 @@ bool parser::ReadFile(void)
     File.close();
     return true;
   }
+  ErrLog.Log(std::format("Cannot open file {}. Please, put it in 'bin\\scenes'", SceneIn));
+  ErrLog.Print();
   return false;
 } /* End of 'parser::ReadFile' function */
 

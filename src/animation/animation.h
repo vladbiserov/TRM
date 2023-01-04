@@ -8,7 +8,7 @@
   *               Animation module.
   * PROGRAMMER  : Vladislav Biserov.
   *               Maxim Molostov.
-  * LAST UPDATE : 17.11.2022
+  * LAST UPDATE : 05.01.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
@@ -134,6 +134,10 @@ namespace trm
     {
       UBO_ANIM *UC = nullptr;
       UboAnim = CreateBuffer(3, UC);
+
+      /* Update menu */
+      win::CurSceneName = "a.scene";
+      win::UpdateMenuSceneName();
     } /* End of constructor */
 
     static animation Instance; //Instance of animation interface

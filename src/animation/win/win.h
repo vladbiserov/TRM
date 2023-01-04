@@ -8,7 +8,7 @@
   *               Window module.
   * PROGRAMMER  : Vladislav Biserov.
   *               Maxim Molostov.
-  * LAST UPDATE : 17.11.2022
+  * LAST UPDATE : 05.01.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
@@ -20,7 +20,12 @@
 #define __win_h_
 
 #include <windowsx.h>
+#include <string>
 #include "../../def.h"
+#include "../../../res/resource.h"
+
+#define CLASS_NAME "Ray Marching Class Window"
+#define WINDOW_NAME "Tough Ray Marching"
 
 /* NSF name space */
 namespace trm
@@ -33,8 +38,21 @@ namespace trm
     INT W = 0, H = 0;    // window size
     HINSTANCE hInstance; // application handle
     INT MouseWheel = 0;  //mouse wheel state/change
+    std::string CurSceneName;   // Current file scene
+    bool IsFileChanged = false; // Flag is changed file
+    std::string WorkDirectory;  // Working directory
+    static BOOL IsActive;
+
+    /* Update menu scene name item function.
+     * ARGUMENTS: None.
+     * RETURNS: None.
+     */
+    VOID UpdateMenuSceneName( VOID );
  
   private:
+    HMENU Menu;     // Menu
+    HWND DlgAbout;  // Dialog about
+
     /* Window handle function.
      * ARGUMENTS:
      *   - window handle:
@@ -50,25 +68,33 @@ namespace trm
      */
     static LRESULT CALLBACK WinFunc( HWND hWnd, UINT Msg,
                                      WPARAM wParam, LPARAM lParam );
+
+    /* Window handle function.
+     * ARGUMENTS:
+     *   - window handle:
+     *      HWND hWnd;
+     *   - message type (see WM_***):
+     *      UINT Msg;
+     *   - message 'word' parameter:
+     *      WPARAM wParam;
+     *   - message 'long' parameter:
+     *      LPARAM lParam;
+     * RETURNS:
+     *   (LRESULT) message depende return value.
+     */
+    static BOOL CALLBACK DlgProc( HWND hWnd, UINT Msg,
+                                     WPARAM wParam, LPARAM lParam );
  
     BOOL IsFullScreen = FALSE;        //is window full screen flag
     RECT FullScreenSaveRect = RECT(); //full screen save rectangle
- 
- 
   public:
-    BOOL IsActive = FALSE; //is window active
     BOOL IsInit = FALSE;   //initialize flag
  
     /* Constructor declaration */
     win( HINSTANCE hInst = GetModuleHandle(nullptr) );
-    /* Destructor declaration */
-    //~win( VOID );
  
     /* Run window function declaration */
     INT Run( VOID );
-
-    /* Flip full screen function declaration */
-    //VOID FlipFullScreen( VOID ); 
   private:
     /* virtual animation methods */
 
@@ -218,13 +244,25 @@ namespace trm
      */
     VOID OnPaint( HDC hDC, PAINTSTRUCT *PS );
 
+    /* WM_CLOSE window message handle function.
+     * ARGUMENTS: None.
+     * RETURNS: None.
+     */
     VOID OnClose( VOID );
 
     /* WM_DESTROY window message handle function.
      * ARGUMENTS: None.
      * RETURNS: None.
      */
-    VOID OnDestroy( VOID );   
+    VOID OnDestroy( VOID );
+
+    /* WM_COMMAND window message handle function.
+     * ARGUMENTS:
+     *   - message 'word' parameter:
+     *       WPARAM wParam;
+     * RETURNS: None.
+     */
+    VOID OnCommand( WPARAM wParam );
 
     /* WM_ACTIVATE window message handle function.
      * ARGUMENTS:

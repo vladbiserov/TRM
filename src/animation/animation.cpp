@@ -8,7 +8,7 @@
   *               Animation module.
   * PROGRAMMER  : Vladislav Biserov.
   *               Maxim Molostov.
-  * LAST UPDATE : 17.11.2022
+  * LAST UPDATE : 05.01.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
@@ -29,19 +29,35 @@ VOID trm::animation::Render( VOID )
 {
   UboAnim->Apply();
   timer::Response();
-  input::Response();
+  if (win::IsActive)
+    input::Response();
   Scene->Response(this);
   render::Start();
-  if (DW.IsChanged())
+  /* Update scene */
+  if (DW.IsChanged() || win::IsFileChanged)
   {
+    std::string LName = Parser.SceneIn;
+    if (win::IsFileChanged)
+    {
+      win::IsFileChanged = false;
+      Parser.SceneIn = "bin\\scenes\\" + win::CurSceneName;
+    }
+    SetCurrentDirectory(win::WorkDirectory.c_str());
     if (Parser.ReadFile())
     {
       Parser.GetExprs();
-      Parser.WriteFile();
+      if (Parser.WriteFile())
+      {
+        UpdateTextures();
+        shader_manager::Update();
+        OutputDebugString("Shader was update!\n");
+        win::UpdateMenuSceneName();
+      }
+      else
+        Parser.SceneIn = "bin\\scenes\\" + LName;
     }
-    UpdateTextures();
-    shader_manager::Update();
-    OutputDebugString("Shader was update!\n");
+    else
+      Parser.SceneIn = "bin\\scenes\\" + LName;
   }
   UBO_ANIM UC =
   {
@@ -66,17 +82,19 @@ VOID trm::animation::UpdateTextures( VOID )
  */
 VOID trm::animation::Init( VOID )
 {
-  DW.StartWatch("bin/scenes");
+  DW.StartWatch("bin\\scenes");
 
+  SetCurrentDirectory(win::WorkDirectory.c_str());
   if (Parser.ReadFile())
   {
     Parser.GetExprs();
-    Parser.WriteFile();
+    if (Parser.WriteFile())
+    {
+      UpdateTextures();
+      shader_manager::Update();
+      OutputDebugString("Shader was update!\n");
+    }
   }
-  UpdateTextures();
-  shader_manager::Update();
-  OutputDebugString("Shader was update!\n");
-
 }; /* End of 'trm::animation::Init' function */
 
 /* Deinitialization function.

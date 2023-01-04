@@ -28,12 +28,13 @@
 /* Parser class */
 class parser
 {
+public:
+  std::string SceneIn, ShaderIn, ShaderOut;
 private:
   bool
     IsFileInit = false,  // Flag is file inited
     IsFailed = false;    // Flag is something went wrong
   std::string InBuf, OutBuf, PointLgtBuf, DirLgtBuf, SpotLgtBuf; // Different buffers
-  std::string SceneIn, ShaderIn, ShaderOut;  // File names
   std::map<std::string, std::string> Voc; // Parser vocabulary
   std::map<std::string, lgt *> Lgts;  // Lights
   error_log ErrLog;  // Error logger
