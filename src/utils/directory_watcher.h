@@ -35,6 +35,8 @@ namespace trm
     BYTE Buffer[27 * 47] {};
     // Store path
     std::string Path;
+    // Last time when file was updated in directory
+    double LastTimeUpdate = 0;
 
   public: 
     /* Start directory watching function.
@@ -84,13 +86,18 @@ namespace trm
     } /* End of 'StopWatch' function */ 
 
     /* Check if directory is changed function.
-     * ARGUMENTS: None.
+     * ARGUMENTS:
+     *    - Current time:
+     *        double Time;
      * RETURNS:
      *   (BOOL) TRUE if directory contents is changed (and subfolders). 
      */ 
-    BOOL IsChanged( VOID )
+    BOOL IsChanged( double Time )
     {
       if (Ovr.hEvent == nullptr || hDir == nullptr)
+        return FALSE;
+
+      if (Time - LastTimeUpdate < 2.7)
         return FALSE;
 
       INT id = WaitForSingleObject(Ovr.hEvent, 0);
@@ -105,6 +112,7 @@ namespace trm
           nullptr,
           &Ovr,
           nullptr);
+        LastTimeUpdate = Time;
         return TRUE;
       }
       return FALSE;

@@ -45,8 +45,10 @@ LRESULT CALLBACK trm::win::WinFunc(HWND hWnd, UINT Msg,
   {
   case WM_GETMINMAXINFO:
     minmax = (MINMAXINFO*)lParam;
-    minmax->ptMaxTrackSize.y = GetSystemMetrics(SM_CYMAXTRACK) +
-      GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYBORDER) * 2;
+    // minmax->ptMaxTrackSize.y = GetSystemMetrics(SM_CYMAXTRACK) +
+    //   GetSystemMetrics(SM_CYCAPTION) + GetSystemMetrics(SM_CYBORDER) * 2;
+    minmax->ptMinTrackSize.x = 347;
+    minmax->ptMinTrackSize.y = 347;
     return 0;
   case WM_CREATE:
     SetWindowLongPtr(hWnd, 0, (UINT_PTR)((CREATESTRUCT*)lParam)->lpCreateParams);

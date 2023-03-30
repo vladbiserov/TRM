@@ -8,7 +8,7 @@
   *               Animation module.
   * PROGRAMMER  : Vladislav Biserov.
   *               Maxim Molostov.
-  * LAST UPDATE : 05.01.2023
+  * LAST UPDATE : 30.03.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
@@ -34,7 +34,7 @@ VOID trm::animation::Render( VOID )
   Scene->Response(this);
   render::Start();
   /* Update scene */
-  if (DW.IsChanged() || win::IsFileChanged)
+  if (DW.IsChanged(GlobalTime) || win::IsFileChanged)
   {
     std::string LName = Parser.SceneIn;
     if (win::IsFileChanged)
