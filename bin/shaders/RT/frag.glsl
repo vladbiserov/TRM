@@ -32,8 +32,6 @@ layout(std140, binding = 3) uniform Animation
   float Time;
 };
 
-layout(binding = 0) uniform sampler2D Tex0;
-uniform bool IsTexture0;
 
 in vec2 DrawTexCoord;
 
@@ -420,276 +418,31 @@ float SceneSDF( in vec3 point, inout surface mtl )
 float res = 0, tmp;
 surface tmp_mtl;         
 
-// create 'c' var
-surface mtl_c;
-vec2 uv_c;
-vec3 N2_c, N3_c, mod_c = point;
-float c;
+// add shape 'a2'
+float a2;
+surface mtl_a2;
+vec3 mod_a2 = point;
 
-c = SDFPlane(mod_c, plane(vec3(0,0,1), -10, MtlLib[6]));
-mtl_c = MtlLib[6];
-uv_c = vec2(0);
-if (vec3(0,0,1).x == 1)
-  N2_c = vec3(0, 0, 1);
-else
-  N2_c = vec3(1, 0, 0);
-N3_c = normalize(cross(vec3(0,0,1), N2_c));
-N2_c = normalize(cross(N3_c, vec3(0,0,1)));
-uv_c = vec2(dot(point - vec3(0,0,1) * -10, N2_c) / 4, -dot(point - vec3(0,0,1) * -10, N3_c) / 4);
-mtl_c.Kd = texture(Tex0, uv_c).bgr;
+// add shape 'a3'
+float a3;
+surface mtl_a3;
+vec3 mod_a3 = point;
 
+// apply SDF function to 'a2'
+a2 = SDFPlane(mod_a2, plane(vec3(0,1,0), 0, MtlLib[6]));
+mtl_a2 = MtlLib[6];
 
-// create 'head' var
-surface mtl_head;
-vec2 uv_head;
-vec3 N2_head, N3_head, mod_head = point;
-float head;
+// apply SDF function to 'a3'
+a3 = SDFEllipsoid(mod_a3, ellipsoid(vec3(0,4,0), vec3(abs(sin(Time))*8), MtlLib[12]));
+mtl_a3 = MtlLib[12];
 
-head = SDFCapsule(mod_head, capsule(vec3(0), vec3(0,4,0), 8, MtlLib[9]));
-mtl_head = MtlLib[9];
+// apply SDF function to 'a3'
+a3 = SDFCapsule(mod_a3, capsule(vec3(0), vec3(0,5,0), 3, MtlLib[10]));
+mtl_a3 = MtlLib[10];
 
-
-// create 'e1' var
-surface mtl_e1;
-vec2 uv_e1;
-vec3 N2_e1, N3_e1, mod_e1 = point;
-float e1;
-
-e1 = SDFSphere(mod_e1, sphere(vec3(-3,5,6+abs(cos(Time*5))*0.5), 1.5+abs(sin(Time*5))*0.5, MtlLib[20]));
-mtl_e1 = MtlLib[20];
-
-
-// create 'z1' var
-surface mtl_z1;
-vec2 uv_z1;
-vec3 N2_z1, N3_z1, mod_z1 = point;
-float z1;
-
-z1 = SDFSphere(mod_z1, sphere(vec3(-3.2,5.2,7+abs(cos(Time*5))*0.5), 0.5+abs(sin(Time*5))*0.5, MtlLib[18]));
-mtl_z1 = MtlLib[18];
-
-
-// update 'e1' var
-tmp = e1;
-tmp_mtl = mtl_e1;
-e1 = SDFUnion(e1, z1);
-if (e1 == tmp)
-  mtl_e1 = tmp_mtl;
-else if (e1 == z1)
-  mtl_e1 = mtl_z1;
-else
-  mtl_e1 = SDFSurfaceSmoothUnion(tmp, tmp_mtl, z1, mtl_z1, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFDiferSmooth(head, e1, 0.5);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == e1)
-  mtl_head = mtl_e1;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, e1, mtl_e1, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFUnion(head, e1);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == e1)
-  mtl_head = mtl_e1;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, e1, mtl_e1, 0.5);
-
-// create 'e2' var
-surface mtl_e2;
-vec2 uv_e2;
-vec3 N2_e2, N3_e2, mod_e2 = point;
-float e2;
-
-e2 = SDFSphere(mod_e2, sphere(vec3(3,5,6+abs(sin(Time*5))*0.5), 1.5+abs(cos(Time*5))*0.5, MtlLib[20]));
-mtl_e2 = MtlLib[20];
-
-
-// create 'z2' var
-surface mtl_z2;
-vec2 uv_z2;
-vec3 N2_z2, N3_z2, mod_z2 = point;
-float z2;
-
-z2 = SDFSphere(mod_z2, sphere(vec3(3.2,5.2,7+abs(sin(Time*5))*0.5), 0.5+abs(cos(Time*5))*0.5, MtlLib[18]));
-mtl_z2 = MtlLib[18];
-
-
-// update 'e2' var
-tmp = e2;
-tmp_mtl = mtl_e2;
-e2 = SDFUnion(e2, z2);
-if (e2 == tmp)
-  mtl_e2 = tmp_mtl;
-else if (e2 == z2)
-  mtl_e2 = mtl_z2;
-else
-  mtl_e2 = SDFSurfaceSmoothUnion(tmp, tmp_mtl, z2, mtl_z2, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFDiferSmooth(head, e2, 0.5);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == e2)
-  mtl_head = mtl_e2;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, e2, mtl_e2, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFUnion(head, e2);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == e2)
-  mtl_head = mtl_e2;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, e2, mtl_e2, 0.5);
-
-// create 'm' var
-surface mtl_m;
-vec2 uv_m;
-vec3 N2_m, N3_m, mod_m = point;
-float m;
-
-m = SDFCapsule(mod_m, capsule(vec3(0,0,8), vec3(0,abs(sin(Time*10)),8), 2+cos(Time)*0.8, MtlLib[2]));
-mtl_m = MtlLib[2];
-
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFDiferSmooth(head, m, 0.3);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == m)
-  mtl_head = mtl_m;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, m, mtl_m, 0.5);
-
-// create 'b1' var
-surface mtl_b1;
-vec2 uv_b1;
-vec3 N2_b1, N3_b1, mod_b1 = point;
-float b1;
-
-b1 = SDFTorus(mod_b1, torus(vec3(-3,6+abs(cos(Time*5))*2,8), vec3(0,0,1), 2, 0.2, MtlLib[18]));
-mtl_b1 = MtlLib[18];
-
-
-// create 'b2' var
-surface mtl_b2;
-vec2 uv_b2;
-vec3 N2_b2, N3_b2, mod_b2 = point;
-float b2;
-
-b2 = SDFBox(mod_b2, box(vec3(-3,5.2+abs(cos(Time*5))*2,8), vec3(3,2.3,2.3), MtlLib[18]));
-mtl_b2 = MtlLib[18];
-
-
-// update 'b1' var
-tmp = b1;
-tmp_mtl = mtl_b1;
-b1 = SDFDifer(b1, b2);
-if (b1 == tmp)
-  mtl_b1 = tmp_mtl;
-else if (b1 == b2)
-  mtl_b1 = mtl_b2;
-else
-  mtl_b1 = SDFSurfaceSmoothUnion(tmp, tmp_mtl, b2, mtl_b2, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFUnion(b1, head);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == b1)
-  mtl_head = mtl_b1;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, b1, mtl_b1, 0.5);
-
-// update 'b1' var
-b1 = SDFTorus(mod_b1, torus(vec3(3,6+abs(sin(Time*5))*2,8), vec3(0,0,1), 2, 0.2, MtlLib[18]));
-mtl_b1 = MtlLib[18];
-
-// update 'b2' var
-b2 = SDFBox(mod_b2, box(vec3(3,5.2+abs(sin(Time*5))*2,8), vec3(3,2.3,2.3), MtlLib[18]));
-mtl_b2 = MtlLib[18];
-
-// update 'b1' var
-tmp = b1;
-tmp_mtl = mtl_b1;
-b1 = SDFDifer(b1, b2);
-if (b1 == tmp)
-  mtl_b1 = tmp_mtl;
-else if (b1 == b2)
-  mtl_b1 = mtl_b2;
-else
-  mtl_b1 = SDFSurfaceSmoothUnion(tmp, tmp_mtl, b2, mtl_b2, 0.5);
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFUnion(b1, head);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == b1)
-  mtl_head = mtl_b1;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, b1, mtl_b1, 0.5);
-
-// create 's' var
-surface mtl_s;
-vec2 uv_s;
-vec3 N2_s, N3_s, mod_s = point;
-float s;
-
-s = SDFSphere(mod_s, sphere(vec3(sin(Time*2)*8,2,-2), 9+cos(Time*2), MtlLib[10]));
-mtl_s = MtlLib[10];
-
-
-// update 'head' var
-tmp = head;
-tmp_mtl = mtl_head;
-head = SDFUnionSmooth(head, s, 1);
-if (head == tmp)
-  mtl_head = tmp_mtl;
-else if (head == s)
-  mtl_head = mtl_s;
-else
-  mtl_head = SDFSurfaceSmoothUnion(tmp, tmp_mtl, s, mtl_s, 0.5);
-
-// add to scene 'c' var
-res = c;
-mtl = mtl_c;
-
-// add to scene 'head' var
-tmp = res;
-tmp_mtl = mtl;
-res = SDFUnion(tmp, head);
-if (res == head)
-  mtl = mtl_head;
-else if (res == tmp)
-  mtl = tmp_mtl;
-else
-  mtl = SDFSurfaceSmoothUnion(tmp, tmp_mtl, head, mtl_head, 0.5);
-
-
-// create 'd' var
-surface mtl_d;
-vec2 uv_d;
-vec3 N2_d, N3_d, mod_d = point;
-float d;
+// add to scene 'a3' var
+res = a3;
+mtl = mtl_a3;
 
 
 return res;
@@ -773,12 +526,12 @@ float ShadowSpot( inout light_info Li, spot_light Lgt, vec3 P )
   return min(att, 1);  
 } 
 
-bool IsPointLgt = false;
+bool IsPointLgt = true;
 const int PointLgtCnt = 1;
-const point_light PointLgt[PointLgtCnt] = {point_light(vec3(13, 8, 8), vec3(1, 0.7, 0.47), 0.4, 0.6, 0.06)};
-bool IsDirLgt = true;
-const int DirLgtCnt = 2;
-const dir_light DirLgt[DirLgtCnt] = {dir_light(vec3(0,0,1), vec3(0.4)),dir_light(vec3(0,0,-1), vec3(0.4)),}; 
+const point_light PointLgt[PointLgtCnt] = {point_light(vec3(0,15,10), vec3(1,1,1), 0.4, 0.6, 0.06)}; 
+bool IsDirLgt = false;
+const int DirLgtCnt = 1;
+const dir_light DirLgt[DirLgtCnt] = {dir_light(vec3(1, 0, 0), vec3(0.1))};
 bool IsSpotLgt = false;
 const int SpotLgtCnt = 1;
 const spot_light SpotLgt[SpotLgtCnt] = {spot_light(vec3(1, 2, 1), vec3(0, 1, 0), vec3(0.1), cos(0.1), cos(1.1))};

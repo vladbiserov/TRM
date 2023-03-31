@@ -47,7 +47,7 @@
       <UniqueIdentifier>{3c88f56e-b4f6-4310-a6da-b4ca2802b619}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Utils\Parser\Objects">
-      <UniqueIdentifier>{6b5a745c-ce82-4081-81c6-9744702734e3}</UniqueIdentifier>
+      <UniqueIdentifier>{bd2d4b9b-55f3-4a22-9f5b-1a9bd10e378e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,32 +138,47 @@
     <ClInclude Include="src\animation\input\timer.h">
       <Filter>Source Files\Animation\Input</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\error.h">
+    <ClInclude Include="res\resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\expr.h">
+      <Filter>Source Files\Utils\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\file.h">
+      <Filter>Source Files\Utils\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\lexer.h">
       <Filter>Source Files\Utils\Parser</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\parser\parser.h">
       <Filter>Source Files\Utils\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\shapes.h">
+    <ClInclude Include="src\utils\parser\statement.h">
+      <Filter>Source Files\Utils\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\token.h">
+      <Filter>Source Files\Utils\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\variable.h">
+      <Filter>Source Files\Utils\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\parser\obj\light.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\lights.h">
+    <ClInclude Include="src\utils\parser\obj\mod.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\opers.h">
+    <ClInclude Include="src\utils\parser\obj\obj.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\obj_def.h">
+    <ClInclude Include="src\utils\parser\obj\oper.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\objects.h">
+    <ClInclude Include="src\utils\parser\obj\param.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\parser\objects\mods.h">
+    <ClInclude Include="src\utils\parser\obj\shape.h">
       <Filter>Source Files\Utils\Parser\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="res\resource.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,11 +227,20 @@
     <ClCompile Include="src\utils\parser\file.cpp">
       <Filter>Source Files\Utils\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\parser\object_helper.cpp">
+    <ClCompile Include="src\utils\parser\variable.cpp">
       <Filter>Source Files\Utils\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\parser\parser.cpp">
-      <Filter>Source Files\Utils\Parser</Filter>
+    <ClCompile Include="src\utils\parser\obj\light.cpp">
+      <Filter>Source Files\Utils\Parser\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\parser\obj\mod.cpp">
+      <Filter>Source Files\Utils\Parser\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\parser\obj\oper.cpp">
+      <Filter>Source Files\Utils\Parser\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\parser\obj\shape.cpp">
+      <Filter>Source Files\Utils\Parser\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

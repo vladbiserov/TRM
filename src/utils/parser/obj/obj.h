@@ -3,7 +3,7 @@
  *    Computer Graphics Support Group of 30 Phys-Math Lyceum
  *************************************************************/
 
-/* FILE NAME   : file.cpp
+/* FILE NAME   : obj.h
  * PURPOSE     : Ray marching project.
  *               Parser module.
  * PROGRAMMER  : Vladislav Biserov.
@@ -14,8 +14,14 @@
  * Computer Graphics Support Group of 30 Phys-Math Lyceum
  */
 
-#include "file.h"
+#ifndef __obj_h_
+#define __obj_h_
 
-std::string parser::file::CurBuf = "";
+#include "mod.h"
+#include "shape.h"
+#include "oper.h"
+#include "light.h"
 
-/* END OF 'file.cpp' FILE */
+#endif
+
+/* END OF 'obj.h' FILE */

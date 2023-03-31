@@ -27,7 +27,7 @@
 #include "input/input.h"
 #include "render/render.h"
 #include "../utils/directory_watcher.h"
-#include "../utils/parser/parser.h"
+// #include "../utils/parser/parser.h"
 
 /* NSF name space */
 namespace trm
@@ -126,11 +126,11 @@ namespace trm
     };
     buffer *UboAnim;
     directory_watcher DW;
-    parser Parser;
+    // parser Parser;
 
     /* Hiden constructor */
-    animation( VOID ) : render(win::hWnd, win::W, win::H), input(win::MouseWheel, win::hWnd), Scene(new scene),
-      Parser("bin\\scenes\\a.scene", "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl", "bin\\error.log", Textures)
+    animation( VOID ) : render(win::hWnd, win::W, win::H), input(win::MouseWheel, win::hWnd), Scene(new scene)
+      // Parser("bin\\scenes\\a.scene", "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl", "bin\\error.log", Textures)
     {
       UBO_ANIM *UC = nullptr;
       UboAnim = CreateBuffer(3, UC);

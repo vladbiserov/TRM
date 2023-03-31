@@ -18,6 +18,7 @@
 
 #include <fstream>
 #include "animation.h"
+#include "../utils/parser/parser.h"
 
 trm::animation trm::animation::Instance;
 
@@ -27,37 +28,29 @@ trm::animation trm::animation::Instance;
  */
 VOID trm::animation::Render( VOID )
 {
+  static std::string SName = "bin\\scenes\\a.scene";
   UboAnim->Apply();
   timer::Response();
   if (win::IsActive)
     input::Response();
   Scene->Response(this);
   render::Start();
-  /* Update scene */
-  if (DW.IsChanged(GlobalTime) || win::IsFileChanged)
+  
+  if (DW.IsChanged(GlobalTime))
   {
-    std::string LName = Parser.SceneIn;
-    if (win::IsFileChanged)
-    {
-      win::IsFileChanged = false;
-      Parser.SceneIn = "bin\\scenes\\" + win::CurSceneName;
-    }
+    parser::Parse(SName,
+      "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+    shader_manager::Update();
+  }
+  if (win::IsFileChanged)
+  {
+    win::IsFileChanged = false;
+    SName = "bin\\scenes\\" + win::CurSceneName;
     SetCurrentDirectory(win::WorkDirectory.c_str());
-    if (Parser.ReadFile())
-    {
-      Parser.GetExprs();
-      if (Parser.WriteFile())
-      {
-        UpdateTextures();
-        shader_manager::Update();
-        OutputDebugString("Shader was update!\n");
-        win::UpdateMenuSceneName();
-      }
-      else
-        Parser.SceneIn = "bin\\scenes\\" + LName;
-    }
-    else
-      Parser.SceneIn = "bin\\scenes\\" + LName;
+    win::UpdateMenuSceneName();
+    parser::Parse(SName,
+      "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+    shader_manager::Update();
   }
   UBO_ANIM UC =
   {
@@ -85,16 +78,20 @@ VOID trm::animation::Init( VOID )
   DW.StartWatch("bin\\scenes");
 
   SetCurrentDirectory(win::WorkDirectory.c_str());
-  if (Parser.ReadFile())
-  {
-    Parser.GetExprs();
-    if (Parser.WriteFile())
-    {
-      UpdateTextures();
-      shader_manager::Update();
-      OutputDebugString("Shader was update!\n");
-    }
-  }
+  parser::Parse("bin\\scenes\\a.scene",
+    "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+  shader_manager::Update();
+
+  // if (Parser.ReadFile())
+  // {
+  //   Parser.GetExprs();
+  //   if (Parser.WriteFile())
+  //   {
+  //     UpdateTextures();
+  //     shader_manager::Update();
+  //     OutputDebugString("Shader was update!\n");
+  //   }
+  // }
 }; /* End of 'trm::animation::Init' function */
 
 /* Deinitialization function.

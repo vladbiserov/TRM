@@ -1,28 +1,42 @@
 /*************************************************************
- * Copyright (C) 2022
+ * Copyright (C) 2022-2023
  *    Computer Graphics Support Group of 30 Phys-Math Lyceum
  *************************************************************/
 
- /* FILE NAME   : obj_def.h
+ /* FILE NAME   : param.h
   * PURPOSE     : Ray marching project.
+  *               Parser module.
   * PROGRAMMER  : Vladislav Biserov.
-  *               Maxim Molostov.
-  * LAST UPDATE : 28.12.2022
+  * LAST UPDATE : 30.03.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
   * Computer Graphics Support Group of 30 Phys-Math Lyceum
   */
 
-#ifndef __obj_def_h_
-#define __obj_def_h_
+#ifndef __param_h_
+#define __param_h_
 
-/* Include all objects */
-#include "opers.h"
-#include "lights.h"
-#include "shapes.h"
-#include "mods.h"
+#include <map>
+#include <functional>
+#include <string>
 
-#endif /* __obj_def_h_ */
+namespace parser
+{
+  class param
+  {
+  public:
+    enum class type
+    {
+      eNum,
+      eVec,
+      eMat,
+      eTex,
+      eShp
+    };
+  };
+}
 
-/* END OF 'obj_def.h' FILE */
+#endif
+
+/* END OF 'param.h' FILE */

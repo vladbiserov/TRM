@@ -174,14 +174,19 @@
     <ClInclude Include="src\math\mth_vec3.h" />
     <ClInclude Include="src\math\mth_vec4.h" />
     <ClInclude Include="src\utils\directory_watcher.h" />
-    <ClInclude Include="src\utils\parser\error.h" />
-    <ClInclude Include="src\utils\parser\objects\lights.h" />
-    <ClInclude Include="src\utils\parser\objects\mods.h" />
-    <ClInclude Include="src\utils\parser\objects\objects.h" />
-    <ClInclude Include="src\utils\parser\objects\obj_def.h" />
-    <ClInclude Include="src\utils\parser\objects\opers.h" />
-    <ClInclude Include="src\utils\parser\objects\shapes.h" />
+    <ClInclude Include="src\utils\parser\expr.h" />
+    <ClInclude Include="src\utils\parser\file.h" />
+    <ClInclude Include="src\utils\parser\lexer.h" />
+    <ClInclude Include="src\utils\parser\obj\light.h" />
+    <ClInclude Include="src\utils\parser\obj\mod.h" />
+    <ClInclude Include="src\utils\parser\obj\obj.h" />
+    <ClInclude Include="src\utils\parser\obj\oper.h" />
+    <ClInclude Include="src\utils\parser\obj\param.h" />
+    <ClInclude Include="src\utils\parser\obj\shape.h" />
     <ClInclude Include="src\utils\parser\parser.h" />
+    <ClInclude Include="src\utils\parser\statement.h" />
+    <ClInclude Include="src\utils\parser\token.h" />
+    <ClInclude Include="src\utils\parser\variable.h" />
     <ClInclude Include="src\utils\reader.h" />
     <ClInclude Include="src\utils\stock.h" />
   </ItemGroup>
@@ -201,8 +206,11 @@
     <ClCompile Include="src\unit\ctrl.cpp" />
     <ClCompile Include="src\unit\test.cpp" />
     <ClCompile Include="src\utils\parser\file.cpp" />
-    <ClCompile Include="src\utils\parser\object_helper.cpp" />
-    <ClCompile Include="src\utils\parser\parser.cpp" />
+    <ClCompile Include="src\utils\parser\obj\light.cpp" />
+    <ClCompile Include="src\utils\parser\obj\mod.cpp" />
+    <ClCompile Include="src\utils\parser\obj\oper.cpp" />
+    <ClCompile Include="src\utils\parser\obj\shape.cpp" />
+    <ClCompile Include="src\utils\parser\variable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\shaders\RT\frag.glsl">

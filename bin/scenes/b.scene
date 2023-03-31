@@ -1,0 +1,7 @@
+/**/
+shape a2 = plane(vec3(0, 1, 0), 0, MtlLib[6]);
+shape a3 = sphere(vec3(2 * cos(Time), 4 * sin(Time), 3), 1, MtlLib[1]);
+light l = point(vec3(0, 15, 10), vec3(1, 1, 1));
+
+add(a2, a3);
+add(l);
