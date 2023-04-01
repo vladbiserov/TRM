@@ -38,8 +38,6 @@ layout(origin_upper_left) in vec4 gl_FragCoord;
 
 layout(binding = 1) uniform sampler2D Tex1;
 uniform bool IsTexture1;
-layout(binding = 2) uniform sampler2D Tex2;
-uniform bool IsTexture2;
 
 in vec2 DrawTexCoord;
 
@@ -80,7 +78,7 @@ struct spot_light
   float A1, A2; 
 };
 
-struct surface
+struct mtl
 {
   vec3 Albedo;
   float roughness, metallic;
@@ -138,17 +136,21 @@ struct hollow_sphere
   float r, h, t; 
 };
 
-const surface MtlLib[] = {
+const mtl MtlLib[] = {
   {vec3(0.5, 0.5, 0.0), 0.5, 0.7},
   {vec3(0.9, 0.1, 0.3), 0.3, 0.8},
 };
 
 
 const float PI = 3.14159;
-const bool IsSkybox = true;
+/*const bool IsSkybox = true;
 const bool IsReflection = true;
 const bool IsShadows = true;
-const bool IsAO = false;    
+const bool IsAO = false;    */
+const bool IsSkybox = true;
+const bool IsReflection = true;
+const bool IsShadows = false;
+const bool IsAO = false;
 
 float D2R( float Degree )
 {
@@ -335,10 +337,10 @@ float SDFDiferSmooth( float distA, float distB, float k )
   return mix(distA, -distB, h) + k * h * (1. - h); 
 }
 
-surface SDFSurfaceSmoothUnion( float k1, surface surface1, float k2, in surface surface2, float smoothness )
+mtl SDFSurfaceSmoothUnion( float k1, mtl surface1, float k2, in mtl surface2, float smoothness )
 {
   float interpolation = clamp(0.5 + 0.5 * (k1 - k2) / smoothness, 0.0, 1.0);
-  return surface(mix(surface2.Albedo, surface1.Albedo, 1 - interpolation),
+  return mtl(mix(surface2.Albedo, surface1.Albedo, 1 - interpolation),
                  mix(surface2.roughness, surface1.roughness, 1 - interpolation),
                  mix(surface2.metallic, surface1.metallic, 1 - interpolation));
 }
@@ -373,7 +375,7 @@ vec3 Replication( vec3 c, vec3 p )
   return mod(p, c) - 0.5 * c;
 }
 
-float SceneSDF( in vec3 point, inout surface mtl )
+float SceneSDF( in vec3 point, inout mtl Mtl )
 {
   /* vec2 TC1, TC2, TC3;
   float a = SDFSphere(point, sphere(vec3(0, 2, -3), 1), TC1),
@@ -389,31 +391,30 @@ float SceneSDF( in vec3 point, inout surface mtl )
   else
   {
     vec3 Albedo = texture(Tex1, TC1).bgr;
-    mtl = surface(Albedo, 0.3, 0.5 + 0.4 * sin(Time));
+    Mtl = mtl(Albedo, 0.3, 0.5 + 0.4 * sin(Time));
   } */
 
- /*  mtl = surface(vec3(0.662, 0.655, 0.634), 0, 1);
+ /*  Mtl = mtl(vec3(0.662, 0.655, 0.634), 0, 1);
 
   return res; */
 
+mtl m = {vec3(0), 1, 2};
+
 float res = HUGE_VAL, tmp;
-surface tmp_mtl;
+mtl tmp_mtl;
 
 // add shape 'a2'
 float a2;
-surface mtl_a2;
+mtl mtl_a2;
 vec3 mod_a2 = point;
 vec2 tex_a2;
 
-// add shape 'a3'
-float a3;
-surface mtl_a3;
-vec3 mod_a3 = point;
-vec2 tex_a3;
+// add mtl 'a'
+mtl a;
 
 // add shape 'a4'
 float a4;
-surface mtl_a4;
+mtl mtl_a4;
 vec3 mod_a4 = point;
 vec2 tex_a4;
 
@@ -422,41 +423,27 @@ a2 = SDFPlane(mod_a2, plane(vec3(0,1,0), 0), tex_a2);
 mtl_a2 = MtlLib[0];
 mtl_a2.Albedo = texture(Tex1, tex_a2).bgr;
 
-// apply SDF function to 'a3'
-a3 = SDFSphere(mod_a3, sphere(vec3(0,4,0), abs(sin(Time))), tex_a3);
-mtl_a3 = MtlLib[1];
-mtl_a3.Albedo = texture(Tex1, tex_a3).bgr;
+// set mtl value to 'a'
+a = mtl(vec3(abs(sin((Time*5.500000))), 0.000000, abs(cos((Time*4.000000)))), 1.000000, 0.500000);
 
 // apply SDF function to 'a4'
-a4 = SDFBox(mod_a4, box(vec3(sin(Time)*8,cos(Time)*8,0), vec3(2)), tex_a4);
-mtl_a4 = MtlLib[1];
-mtl_a4.Albedo = texture(Tex2, tex_a4).bgr;
+a4 = SDFBox(mod_a4, box(vec3(sin(Time)*8,abs(cos(Time))*8,0), vec3(2)), tex_a4);
+mtl_a4 = a;
 
-// apply operation to 'a4'
-tmp = a4;
-tmp_mtl = mtl_a4;
-a4 = SDFUnionSmooth(a4, a2, 1);
-if (a4 == tmp)
-  mtl_a4 = tmp_mtl;
-else if (a4 == a2)
-  mtl_a4 = mtl_a2;
-else
-  mtl_a4 = SDFSurfaceSmoothUnion(tmp, tmp_mtl, a2, mtl_a2, 0.5);
-
-// add to scene 'a3' var
-res = a3;
-mtl = mtl_a3;
+// add to scene 'a2' var
+res = a2;
+Mtl = mtl_a2;
 
 // add to scene 'a4' var
 tmp = res;
-tmp_mtl = mtl;
+tmp_mtl = Mtl;
 res = SDFUnion(tmp, a4);
 if (res == a4)
-  mtl = mtl_a4;
+  Mtl = mtl_a4;
 else if (res == tmp)
-  mtl = tmp_mtl;
+  Mtl = tmp_mtl;
 else
-  mtl = SDFSurfaceSmoothUnion(tmp, tmp_mtl, a4, mtl_a4, 0.5);
+  Mtl = SDFSurfaceSmoothUnion(tmp, tmp_mtl, a4, mtl_a4, 0.5);
 
 
 return res;
@@ -465,7 +452,7 @@ return res;
 vec3 SDFSceneNormal( vec3 P )
 {
   float EPSILON = Threshold;
-  surface Mtl;
+  mtl Mtl;
 
   float a = SceneSDF(vec3(P.x + EPSILON, P.y, P.z), Mtl),
         b = SceneSDF(vec3(P.x - EPSILON, P.y, P.z), Mtl),
@@ -577,7 +564,7 @@ float GeometrySmith( vec3 N, vec3 V, vec3 L, float roughness )
   return ggx1 * ggx2;
 }
 
-vec3 BRDF( vec3 n, vec3 l, vec3 v, float ao, float att, surface Mtl )
+vec3 BRDF( vec3 n, vec3 l, vec3 v, float ao, float att, mtl Mtl )
 {
   vec3 F0 = vec3(0.04); 
   F0 = mix(F0, Mtl.Albedo, Mtl.metallic);
@@ -621,13 +608,13 @@ vec3 Tonemap_ACES( const vec3 x )
 float calcAO( vec3 P, vec3 N )
 {
   float occ = 0.0;
-  surface mtl;
+  mtl Mtl;
   float sca = 1.0;
 
   for (int i = 0; i < 5; i++)
   {
     float h = 0.01 + 0.12 * float(i) / 4.0;
-    float a = SceneSDF(P + h * N, mtl);
+    float a = SceneSDF(P + h * N, Mtl);
 
     occ += (h - a.x) * sca;
     sca *= 0.95;
@@ -640,7 +627,7 @@ float calcAO( vec3 P, vec3 N )
 
 float HardShadow( in ray R, float Min, float Max )
 {                 
-  surface Mtl;
+  mtl Mtl;
 
   for (float t = Min; t < Max;)
   {   
@@ -660,7 +647,7 @@ float SoftShadow( in ray R, float Min, float Max, float k )
 {
   float res = 1.0;
   float ph = 1e20;
-  surface Mtl;
+  mtl Mtl;
 
   for (float t = Min; t < Max;)
   {   
@@ -680,7 +667,7 @@ float SoftShadow( in ray R, float Min, float Max, float k )
   return clamp(res, 0.65, 1);
 }
 
-vec3 Shade( inout ray R, vec3 P, vec3 N, surface Mtl )
+vec3 Shade( inout ray R, vec3 P, vec3 N, mtl Mtl )
 {
   vec3 color = vec3(0);
   float AO;
@@ -765,7 +752,7 @@ void SphereTracing( inout ray R, float MaxDist )
 {
   float t = 0;
   float io;
-  surface Mtl;
+  mtl Mtl;
 
   while (t < MaxDist)
   {
@@ -775,8 +762,8 @@ void SphereTracing( inout ray R, float MaxDist )
     { 
       vec3 P = RayApply(R, t);
       vec3 N = SDFSceneNormal(P);
-      R.Color += Shade(R, P, N, Mtl) * R.Weight;
-      R.Kr = Mtl.metallic;
+      R.Color += Shade(R, P, N, Mtl) * R.Weight * R.Kr;
+      R.Kr = 1 - Mtl.roughness;
       R.Weight *= 0.5;
       return;
     }
@@ -785,7 +772,7 @@ void SphereTracing( inout ray R, float MaxDist )
   }
 
   R.IsSky = true;
-  R.Color += texture(skybox, normalize(R.Dir)).bgr * R.Weight * float(IsSkybox);
+  R.Color += texture(skybox, normalize(R.Dir)).bgr * R.Weight * float(IsSkybox) * R.Kr;
 }
 
 vec3 Render( void )

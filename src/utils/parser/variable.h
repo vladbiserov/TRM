@@ -44,6 +44,7 @@ namespace parser
     }
   public:
     static bool IsFirst;
+    static std::map<state_type, bool> Flags;
 
     static void Clear( void )
     {
@@ -53,6 +54,26 @@ namespace parser
 
       Table["PI"] = { var_type::eFloat, 3.1415 };
       Table["Time"] = { var_type::eFloat, 0 };
+
+      Flags[state_type::eAO] = false;
+      Flags[state_type::eReflect] = true;
+      Flags[state_type::eShadow] = true;
+      Flags[state_type::eSky] = true;
+    }
+
+    static std::string GetFlagStr( void )
+    {
+      std::string 
+        res;
+
+      return std::format("const bool IsSkybox = {0};\n"
+                         "const bool IsReflection = {1};\n"
+                         "const bool IsShadows = {2};\n"
+                         "const bool IsAO = {3};\n", 
+        Flags[state_type::eSky] ? "true" : "false",
+        Flags[state_type::eReflect] ? "true" : "false",
+        Flags[state_type::eShadow] ? "true" : "false",
+        Flags[state_type::eAO] ? "true" : "false");
     }
 
     static data Get(std::string Name)

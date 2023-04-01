@@ -122,6 +122,8 @@ namespace parser
 
       if (TYPES.find(res) != TYPES.end())
         AddToken(res, token_type::eType);
+      else if (STATES.find(res) != STATES.end())
+        AddToken(res, token_type::eState);
       else if (obj::shape::Table.find(res) != obj::shape::Table.end())
         AddToken(res, token_type::eFunc);
       else if (obj::mod::Table.find(res) != obj::mod::Table.end())
@@ -142,6 +144,10 @@ namespace parser
         AddToken("", token_type::eAdd);
       else if (res == "for")
         AddToken("", token_type::eFor);
+      else if (res == "true")
+        AddToken("", token_type::eTrue);
+      else if (res == "false")
+        AddToken("", token_type::eFalse);
       else
         AddToken(res, token_type::eWord);
     }

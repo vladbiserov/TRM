@@ -55,10 +55,14 @@ namespace parser
           file::Print(std::format("// add vec3 '{0}'\n"
             "vec3 {0};\n", Var));
           break;
+        case var_type::eMtl:
+          file::Print(std::format("// add mtl '{0}'\n"
+            "mtl {0};\n", Var));
+          break;
         case var_type::eShape:
           file::Print(std::format("// add shape '{0}'\n"
             "float {0};\n"
-            "surface mtl_{0};\n"
+            "mtl mtl_{0};\n"
             "vec3 mod_{0} = point;\n"
             "vec2 tex_{0};\n", Var));
           break;
@@ -88,6 +92,8 @@ namespace parser
         file::Print(std::format("// set int value to '{0}'\n{0} = int({1});\n", Var, variables::Get(Var).Text));
       else if (Type == var_type::eVec)
         file::Print(std::format("// set vec value to '{0}'\n{0} = {1};\n", Var, variables::Get(Var).Text));
+      else if (Type == var_type::eMtl)
+        file::Print(std::format("// set mtl value to '{0}'\n{0} = {1};\n", Var, variables::Get(Var).Text));
     }
   };
 
@@ -183,23 +189,22 @@ namespace parser
         {
           file::Print(std::format("// add to scene '{0}' var\n"
             "res = {0};\n"
-            "mtl = mtl_{0};\n", s.first));
+            "Mtl = mtl_{0};\n", s.first));
           variables::IsFirst = false;
         }
         else
           file::Print(std::format("// add to scene '{0}' var\n"
             "tmp = res;\n"
-            "tmp_mtl = mtl;\n"
+            "tmp_mtl = Mtl;\n"
             "res = SDFUnion(tmp, {0});\n"
             "if (res == {0})\n"
-            "  mtl = mtl_{0};\n"
+            "  Mtl = mtl_{0};\n"
             "else if (res == tmp)\n"
-            "  mtl = tmp_mtl;\n"
+            "  Mtl = tmp_mtl;\n"
             "else\n"
-            "  mtl = SDFSurfaceSmoothUnion(tmp, tmp_mtl, {0}, mtl_{0}, 0.5);\n", s.first));
-    }
+            "  Mtl = SDFSurfaceSmoothUnion(tmp, tmp_mtl, {0}, mtl_{0}, 0.5);\n", s.first));
       }
-        
+    }
   };
 
   class while_statement : public statement
@@ -251,6 +256,27 @@ namespace parser
     {
       for (Init->Execute(); Term->Eval() != 0; Incr->Execute())
         Block->Execute();
+    }
+  };
+
+  class state_statement : public statement
+  {
+  private:
+    state_type Type;
+    bool Val;
+
+  public:
+    state_statement(state_type Type, bool Val) : Type(Type), Val(Val)
+    {
+    }
+
+    ~state_statement()
+    {
+    }
+
+    void Execute(void) override
+    {
+      variables::Flags[Type] = Val;
     }
   };
 }

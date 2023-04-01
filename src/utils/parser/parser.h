@@ -77,21 +77,6 @@ namespace parser
       Consume(token_type::eCav);  // "
     }
 
-    void MatExpr(void)
-    {
-      token cur = Get(0);
-
-      if (cur.Text != "MtlLib")
-        throw std::exception("incorrect material");
-
-      Consume(token_type::eWord);       // MtlLib
-      Consume(token_type::eLBracket);   // [
-      expr *e = Expr();                           // num
-      Consume(token_type::eRBracket);   // ]
-
-      delete e;
-    }
-
     void ShpExpr(void)
     {
       token cur = Get(0);
@@ -173,7 +158,8 @@ namespace parser
           delete e;
           break;
         case param::type::eMat:
-          MatExpr();
+          e = MtlExpr();
+          delete e;
           break;
         case param::type::eShp:
           ShpExpr();
@@ -206,6 +192,53 @@ namespace parser
         return new light_expr(VarName, obj::light::Table.find(name)->second, par);
 
       throw std::exception("incorrect function!");
+    }
+
+    expr* MtlExpr(void)
+    {
+      token cur = Get(0);
+      if (cur.Text == "mtl")
+      {
+        Consume(token_type::eType);   // mtl
+        Consume(token_type::eLParen); // (
+        expr *alb, *rough, *met;
+
+        alb = VecExpr();
+        Consume(token_type::eSemicolon);
+        rough = Expr();
+        Consume(token_type::eSemicolon);
+        met = Expr();
+
+        Consume(token_type::eRParen); // )
+
+        return new mtl_expr(alb, rough, met);
+      }
+      else if (Match(token_type::eWord))
+      {
+        if (cur.Text == "MtlLib")
+        {
+          Consume(token_type::eLBracket);   // [
+          expr* e = Expr();                           // num
+          Consume(token_type::eRBracket);   // ]
+
+          e->Eval();
+          std::string t = e->Text;
+          delete e;
+
+          return new mtl_expr(nullptr, nullptr, nullptr, true, std::format("MtlLib[int({0})]", t));
+        }
+        else
+        {
+          auto a = variables::Get(cur.Text);
+
+          if (a.Type == var_type::eMtl)
+            return new const_expr(cur.Text);
+
+          throw std::exception("it isn't material!");
+        }
+      }
+      
+      throw std::exception("incorrect material parameters!");
     }
 
     expr* VecExpr(void)
@@ -526,7 +559,30 @@ namespace parser
         return ForStatement();
       if (Match(token_type::eAdd))
         return AddStatement();
+      if (Match(token_type::eState))
+        return StateStatement();
       return AssignStatement();
+    }
+
+    statement* StateStatement(void)
+    {
+      token cur = Get(-1);
+      state_type type = STATES[cur.Text];
+      bool val = false;
+
+      Consume(token_type::eLParen);
+      cur = Next();
+
+      if (cur.Type == token_type::eTrue)
+        val = true;
+      else if (cur.Type == token_type::eFalse)
+        val = false;
+      else
+        throw std::exception("invalid function parameter!");
+
+      Consume(token_type::eRParen);
+
+      return new state_statement(type, val);
     }
 
     statement* AddStatement(void)
@@ -579,6 +635,17 @@ namespace parser
         {
           int p1 = CurPos;
           expr* e = VecExpr();
+          std::string tmp = "";
+
+          for (int i = p1; i < CurPos; i++)
+            tmp += Tokens[i].Text;
+
+          return new assign_statement(TYPES[cur.Text], next.Text, e, tmp);
+        }
+        else if (type == var_type::eMtl)
+        {
+          int p1 = CurPos;
+          expr* e = MtlExpr();
           std::string tmp = "";
 
           for (int i = p1; i < CurPos; i++)
@@ -699,7 +766,7 @@ namespace parser
 
     delete state;
 
-    file::PrintFile(ShIn, ShOut, obj::light::GetStr(), obj::shape::GetTexStr());
+    file::PrintFile(ShIn, ShOut, obj::light::GetStr(), obj::shape::GetTexStr(), variables::GetFlagStr());
     variables::Clear();
   }
 }

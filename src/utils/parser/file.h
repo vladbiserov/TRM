@@ -41,7 +41,7 @@ namespace parser
     }
 
     static void PrintFile(const std::string& InName, const std::string& OutName,
-      const std::string& LgtBuf, const std::string& TexBuf)
+      const std::string& LgtBuf, const std::string& TexBuf, const std::string &FlagBuf)
     {
       std::ofstream FOut(OutName);
       std::ifstream FIn(InName);
@@ -59,6 +59,8 @@ namespace parser
           FOut << TexBuf;
         else if (line == "LIGHT")
           FOut << LgtBuf;
+        else if (line == "FLAG")
+          FOut << FlagBuf;
         else
           FOut << line << std::endl;
       }

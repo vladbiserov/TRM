@@ -485,6 +485,52 @@ namespace parser
       return 0;
     }
   };
+
+  class mtl_expr : public expr
+  {
+  private:
+    expr* Alb, * Rough, * Met;
+    bool IsLib;
+    std::string Mat;
+
+  public:
+    mtl_expr(expr *A, expr *R, expr *M, bool Is = false, std::string Text = "")
+    {
+      Alb = A;
+      Rough = R;
+      Met = M;
+
+      IsLib = Is;
+      Mat = Text;
+    }
+    ~mtl_expr()
+    {
+      if (!IsLib)
+      {
+        delete Alb;
+        delete Rough;
+        delete Met;
+      }
+    }
+
+    double Eval(void) override
+    {
+      if (!IsLib)
+      {
+        double
+          a = Alb->Eval(),
+          b = Rough->Eval(),
+          c = Met->Eval();
+        Text = std::format("mtl({0}, {1}, {2})", Alb->Text, Rough->Text, Met->Text);
+      }
+      else
+        Text = Mat;
+
+//      file::Print(Text);
+      
+      return 0;
+    }
+  };
 }
 
 #endif

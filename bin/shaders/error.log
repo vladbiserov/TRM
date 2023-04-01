@@ -1,0 +1,82 @@
+RT:FRAG:
+ERROR: 0:432: 'mtl' : function name expected 
+ERROR: 0:432: 'mtl' : function is not known 
+ERROR: 0:431: 'assign' :  cannot convert from 'const float' to 'highp structure'
+
+
+RT:FRAG:
+ERROR: 0:432: 'mtl' : function name expected 
+ERROR: 0:432: 'mtl' : function is not known 
+ERROR: 0:431: 'assign' :  cannot convert from 'const float' to 'highp structure'
+
+
+RT:FRAG:
+ERROR: 0:432: 'mtl' : function name expected 
+ERROR: 0:432: 'mtl' : function is not known 
+ERROR: 0:431: 'assign' :  cannot convert from 'const float' to 'highp structure'
+
+
+RT:FRAG:
+ERROR: 0:408: 'surface' : undeclared identifier 
+ERROR: 0:408: 'mtl_a2' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:408: 'surface' : undeclared identifier 
+ERROR: 0:408: 'mtl_a2' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:413: 'surface' : undeclared identifier 
+ERROR: 0:413: 'a' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:413: 'surface' : undeclared identifier 
+ERROR: 0:413: 'a' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:427: 'surface' : undeclared identifier 
+ERROR: 0:428: 'surface' : function name expected 
+ERROR: 0:428: 'surface' : function is not known 
+ERROR: 0:427: 'assign' :  cannot convert from 'const float' to 'highp structure'
+ERROR: 0:435: '=' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:427: 'surface' : undeclared identifier 
+ERROR: 0:428: 'surface' : function name expected 
+ERROR: 0:428: 'surface' : function is not known 
+ERROR: 0:427: 'assign' :  cannot convert from 'const float' to 'highp structure'
+ERROR: 0:435: '=' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:435: '=' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:435: '=' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:440: ';' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:440: ';' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:440: ';' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:440: ';' : syntax error syntax error
+
+
+RT:FRAG:
+ERROR: 0:440: ';' : syntax error syntax error
+
+

@@ -1,5 +1,5 @@
 /**/
-shape a2 = plane(vec3(0, 1, 0), 0, MtlLib[0]);
+shape a2 = plane(vec3(0, 1, 0), 0, MtlLib[0], "CGSG.g24");
 shape a3 = sphere(vec3(2 * cos(Time), -1 + 4 * abs(sin(Time)), 3), 1, MtlLib[1]);
 light l = point(vec3(0, 15, 10), vec3(1, 1, 1));
 
@@ -7,3 +7,5 @@ a3 = smth_union(a2, a3, 1);
 
 add(a3);
 add(l);
+
+rm_skybox(true);

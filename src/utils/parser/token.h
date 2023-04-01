@@ -33,10 +33,20 @@ namespace parser
     eFloat,
     eVec,
     eShape,
-    eLight
+    eLight,
+    eMtl
+  };
+
+  enum class state_type
+  {
+    eSky,
+    eReflect,
+    eShadow,
+    eAO,
   };
 
   extern std::map<std::string, var_type> TYPES;
+  extern std::map<std::string, state_type> STATES;
 
   enum class token_type
   {
@@ -52,6 +62,9 @@ namespace parser
     eFor,
     eSemicolon,
     eAdd,
+    eTrue,
+    eFalse,
+    eState,
 
     ePlus,
     eMinus,

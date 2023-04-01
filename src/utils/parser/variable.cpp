@@ -32,6 +32,23 @@ std::map<std::string, parser::var_type> parser::TYPES =
   {"vec3", parser::var_type::eVec},
   {"shape", parser::var_type::eShape},
   {"light", parser::var_type::eLight},
+  {"mtl", parser::var_type::eMtl},
+};
+
+std::map<std::string, parser::state_type> parser::STATES = 
+{
+  {"rm_ao",      parser::state_type::eAO},
+  {"rm_reflect", parser::state_type::eReflect},
+  {"rm_shadow",  parser::state_type::eShadow},
+  {"rm_skybox",  parser::state_type::eSky},
+};
+
+std::map<parser::state_type, bool> parser::variables::Flags = 
+{
+  {parser::state_type::eAO, false},
+  {parser::state_type::eReflect, true},
+  {parser::state_type::eShadow, true},
+  {parser::state_type::eSky, true},
 };
 
 /* END OF 'variable.cpp' FILE */
