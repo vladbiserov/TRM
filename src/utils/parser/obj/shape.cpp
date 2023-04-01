@@ -15,8 +15,10 @@
  */
 
 #include "shape.h"
+#include "../../../animation/animation.h"
 
-std::map<std::string, std::string> parser::obj::shape::Texs {};
+std::map<std::string, trm::texture::tex_data>& parser::obj::shape::Textures = trm::animation::GetPtr()->Textures;
+int parser::obj::shape::CountOfTex = 1;
 
 const std::map<std::string, parser::obj::shape::type> parser::obj::shape::Table =
 {
@@ -45,64 +47,71 @@ const std::map<parser::obj::shape::type, std::function<std::string(std::string, 
   { // Plane
     parser::obj::shape::type::ePlane, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[3]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[3]));
 
-      return std::format("{0} = SDFPlane(mod_{0}, plane({1}, {2}, {3}));\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2]);
+      return std::format("{0} = SDFPlane(mod_{0}, plane({1}, {2}), tex_{0});\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2])+ tex;
     })
   },
   { // Box
     parser::obj::shape::type::eBox, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[3]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[3]));
 
-      return std::format("{0} = SDFBox(mod_{0}, box({1}, {2}, {3}));\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2]);
+      return std::format("{0} = SDFBox(mod_{0}, box({1}, {2}), tex_{0});\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2])+ tex;
     })
   },
   { // Ellipsoid
     parser::obj::shape::type::eEllipsoid, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[3]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[3]));
 
-      return std::format("{0} = SDFEllipsoid(mod_{0}, ellipsoid({1}, {2}, {3}));\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2]);
+      return std::format("{0} = SDFEllipsoid(mod_{0}, ellipsoid({1}, {2}), tex_{0});\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2])+ tex;
     })
   },
   { // Sphere
     parser::obj::shape::type::eSphere, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[3]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[3]));
 
-      return std::format("{0} = SDFSphere(mod_{0}, sphere({1}, {2}, {3}));\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2]);
+      return std::format("{0} = SDFSphere(mod_{0}, sphere({1}, {2}), tex_{0});\nmtl_{0} = {3};\n", Var, P[0], P[1], P[2]) + tex;
     })
   },
   { // Torus
     parser::obj::shape::type::eTorus, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[5]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[5]));
 
-      return std::format("{0} = SDFTorus(mod_{0}, torus({1}, {2}, {3}, {4}, {5}));\nmtl_{0} = {5};\n", Var, P[0], P[1], P[2], P[3], P[4]);
+      return std::format("{0} = SDFTorus(mod_{0}, torus({1}, {2}, {3}, {4}), tex_{0});\nmtl_{0} = {5};\n", Var, P[0], P[1], P[2], P[3], P[4])+ tex;
     })
   },
   { // Cylinder
     parser::obj::shape::type::eCylinder, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[5]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[5]));
 
-      return std::format("{0} = SDFCylinder(mod_{0}, cylinder({1}, {2}, {3}, {4}, {5}));\nmtl_{0} = {5};\n", Var, P[0], P[1], P[2], P[3], P[4]);
+      return std::format("{0} = SDFCylinder(mod_{0}, cylinder({1}, {2}, {3}, {4}), tex_{0});\nmtl_{0} = {5};\n", Var, P[0], P[1], P[2], P[3], P[4])+ tex;
     })
   },
   { // Capsule
     parser::obj::shape::type::eCapsule, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
+      std::string tex = "";
       if (IsT)
-        AddTex(P[4]);
+        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[4]));
 
-      return std::format("{0} = SDFCapsule(mod_{0}, capsule({1}, {2}, {3}, {4}));\nmtl_{0} = {4};\n", Var, P[0], P[1], P[2], P[3]);
+      return std::format("{0} = SDFCapsule(mod_{0}, capsule({1}, {2}, {3}), tex_{0});\nmtl_{0} = {4};\n", Var, P[0], P[1], P[2], P[3]) + tex;
     })
   },
 };
@@ -111,7 +120,7 @@ std::string parser::obj::shape::GetTexStr(void)
 {
   std::string res;
 
-  for (int i = 0; i < (int)Texs.size(); i++)
+  for (int i = 1; i < CountOfTex; i++)
   {
     res += std::format("layout(binding = {0}) uniform sampler2D Tex{0};\n", i);
     res += std::format("uniform bool IsTexture{};\n", i);

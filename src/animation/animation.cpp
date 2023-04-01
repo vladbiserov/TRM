@@ -40,7 +40,9 @@ VOID trm::animation::Render( VOID )
   {
     parser::Parse(SName,
       "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+    UpdateTextures();
     shader_manager::Update();
+    OutputDebugString("updated\n");
   }
   if (win::IsFileChanged)
   {
@@ -50,6 +52,7 @@ VOID trm::animation::Render( VOID )
     win::UpdateMenuSceneName();
     parser::Parse(SName,
       "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+    UpdateTextures();
     shader_manager::Update();
   }
   UBO_ANIM UC =
@@ -80,18 +83,8 @@ VOID trm::animation::Init( VOID )
   SetCurrentDirectory(win::WorkDirectory.c_str());
   parser::Parse("bin\\scenes\\a.scene",
     "bin\\shaders\\RT\\myfrag.glsl", "bin\\shaders\\RT\\frag.glsl");
+  UpdateTextures();
   shader_manager::Update();
-
-  // if (Parser.ReadFile())
-  // {
-  //   Parser.GetExprs();
-  //   if (Parser.WriteFile())
-  //   {
-  //     UpdateTextures();
-  //     shader_manager::Update();
-  //     OutputDebugString("Shader was update!\n");
-  //   }
-  // }
 }; /* End of 'trm::animation::Init' function */
 
 /* Deinitialization function.

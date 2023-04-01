@@ -1,17 +1,21 @@
 /**/
-shape a2 = plane(vec3(0, 1, 0), 0, MtlLib[6]);
+shape a2 = plane(vec3(0, 1, 0), 0, MtlLib[0], "CGSG.png");
 /*for (int i = 0, i < 5, i = i + 1)
   for (int j = 0, j < 5, j = j + 1)
   {
-    shape a3 = sphere(vec3(i * 2 + j * cos(Time), 4 + j * 2 + i * sin(Time), 3), 1, MtlLib[i + j]);
+    shape a3 = sphere(vec3(i * 2 + j * cos(Time), 4 + j * 2 + i * sin(Time), 3), 1, MtlLib[1]);
     // add(a3);
     a2 = smth_union(a3, a2, abs(sin(Time)));
-  } */
+  }  */
 
-shape a3 = ellipsoid(vec3(0, 4, 0), vec3(abs(sin(Time)) * 8), MtlLib[12]);
-light l = point(vec3(0, 15, 10), vec3(1, 1, 1));
+shape a3 = sphere(vec3(0, 4, 0), abs(sin(Time)), MtlLib[1], "CGSG.png");
+light l = dir(vec3(0, 1, 1), vec3(1, 1, 1));
 
-a3 = capsule(vec3(0), vec3(0, 5, 0), 3, MtlLib[10]);
+shape a4 = box(vec3(sin(Time) * 8, cos(Time) * 8, 0), vec3(2), MtlLib[1], "cgsg.g32");
 
-add(a3);
+//shape a3 = capsule(vec3(0), vec3(0, 5, 0), 3, MtlLib[0]);
+
+a4 = smth_union(a4, a2, 1);
+
+add(a3, a4);
 add(l);

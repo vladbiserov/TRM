@@ -97,9 +97,6 @@ namespace trm
       if (Ovr.hEvent == nullptr || hDir == nullptr)
         return FALSE;
 
-      if (Time - LastTimeUpdate < 2.7)
-        return FALSE;
-
       INT id = WaitForSingleObject(Ovr.hEvent, 0);
       if (id == WAIT_OBJECT_0)
       {
@@ -112,6 +109,8 @@ namespace trm
           nullptr,
           &Ovr,
           nullptr);
+        if (Time - LastTimeUpdate < 4.7)
+          return FALSE;
         LastTimeUpdate = Time;
         return TRUE;
       }

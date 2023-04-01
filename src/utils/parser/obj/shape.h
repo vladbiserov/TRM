@@ -25,6 +25,7 @@
 #include <optional>
 
 #include "param.h"
+#include "../../../animation/render/resource/texture.h"
 
 namespace parser
 {
@@ -33,14 +34,33 @@ namespace parser
     class shape
     {
     private:
-      static void AddTex(const std::string& Name)
+      static int AddTex(const std::string& Name)
       {
-        if (Texs.find(Name) != Texs.end())
-          return;
-        Texs.emplace(Name, "");
+        int s = (int)Name.size();
+        std::string
+          ext = Name.substr(s - 4, 3),
+          name = Name.substr(1, s - 5),
+          res_name = name + ".g32",
+          tmp_name = name + "." + ext;
+        if (Textures.find(res_name) != Textures.end())
+		{
+          return Textures[res_name].n;
+		}
+		else
+		{
+          if (ext != "g32")
+          {
+            std::string fmt = std::format("utils\\ANY2ANY.exe {} {}", "bin//images//" + tmp_name, "bin//images//" + res_name);
+            system(fmt.c_str());
+          }
+
+		  Textures.emplace(res_name, CountOfTex);
+		  return CountOfTex++;
+		}
       }
 
-      static std::map<std::string, std::string> Texs;
+      static std::map<std::string, trm::texture::tex_data>& Textures;
+      static int CountOfTex;
 
     public:
       enum class type
@@ -61,6 +81,12 @@ namespace parser
       static const std::map<type, std::function<std::string(std::string, std::vector<std::string>, bool)>> ToStr;
 
       static std::string GetTexStr(void);
+
+      static void ClearTextures( void )
+      {
+        Textures.clear();
+        CountOfTex = 1;
+      }
     };
   }
 }

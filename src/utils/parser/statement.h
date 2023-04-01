@@ -59,7 +59,8 @@ namespace parser
           file::Print(std::format("// add shape '{0}'\n"
             "float {0};\n"
             "surface mtl_{0};\n"
-            "vec3 mod_{0} = point;\n", Var));
+            "vec3 mod_{0} = point;\n"
+            "vec2 tex_{0};\n", Var));
           break;
         default:
           break;

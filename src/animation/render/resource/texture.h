@@ -63,6 +63,10 @@ namespace trm
     {
       return TexId;
     }
+
+    /*
+     */
+    texture & LoadCube( const std::string &FileName, INT Id );
   private:
     /* Texture load from *.G24 or *.G32 file function.
      * ARGUMENTS:
@@ -108,7 +112,7 @@ namespace trm
      *   (texture *) Pointer to texture.
      */
     texture * CreateModelTexture( VOID *Bits, INT tag, INT W, INT H, const std::string &TexName );
-  protected:
+  public:
     /* Create texture function.
      * ARGUMENTS:
      *   - shader name:

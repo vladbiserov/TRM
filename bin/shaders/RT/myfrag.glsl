@@ -1,10 +1,11 @@
-#version 420
+#version 430
 
 #define Threshold float(0.001)
 #define HUGE_VAL float(1e+38)
 
 //painting color
 layout(location = 0) out vec4 OutColor;
+layout(location = 1) out vec4 Dist;
 
 // camera buffer
 layout(std140, binding = 2) uniform Camera
@@ -32,62 +33,20 @@ layout(std140, binding = 3) uniform Animation
   float Time;
 };
 
+layout(location = 0) uniform samplerCube skybox;
+layout(origin_upper_left) in vec4 gl_FragCoord;
+
 TEXTURE
 
 in vec2 DrawTexCoord;
 
-struct surface
-{
-  vec3 Ka, Kd, Ks; // ambient, diffuse, specular
-  float Ph;        // Bui Tong Phong coefficient
-  float Kr, Kt;    // reflected, transmitted
-};
-
-const surface MtlLib[] = {
-  {/*"Black Plastic",   0*/ vec3(0.0, 0.0, 0.0             ), vec3(0.01, 0.01, 0.01          ), vec3(0.5, 0.5, 0.5                ), 32.9, 0.5, 0.7},
-  {/*"Brass",           1*/ vec3(0.329412,0.223529,0.027451), vec3(0.780392,0.568627,0.113725), vec3(0.992157,0.941176,0.807843   ), 27.8, 0.5, 0.7},
-  {/*"Bronze",          2*/ vec3(0.2125,0.1275,0.054       ), vec3(0.714,0.4284,0.18144      ), vec3(0.393548,0.271906,0.166721   ), 25.6, 0.5, 0.7},
-  {/*"Chrome",          3*/ vec3(0.25, 0.25, 0.25          ), vec3(0.4, 0.4, 0.4             ), vec3(0.774597, 0.774597, 0.774597 ), 76.8, 0.5, 0.7},
-  {/*"Copper",          4*/ vec3(0.19125,0.0735,0.0225     ), vec3(0.7038,0.27048,0.0828     ), vec3(0.256777,0.137622,0.086014   ), 12.8, 0.5, 0.7},
-  {/*"Gold",            5*/ vec3(0.24725,0.1995,0.0745     ), vec3(0.75164,0.60648,0.22648   ), vec3(0.628281,0.555802,0.366065   ), 51.2, 0.5, 0.7},
-  {/*"Peweter",         6*/ vec3(0.10588,0.058824,0.113725 ), vec3(0.427451,0.470588,0.541176), vec3(0.3333,0.3333,0.521569       ), 9.84, 0.5, 0.7},
-  {/*"Silver",          7*/ vec3(0.19225,0.19225,0.19225   ), vec3(0.50754,0.50754,0.50754   ), vec3(0.508273,0.508273,0.508273   ), 51.2, 0.5, 0.7},
-  {/*"Polished Silver", 8*/ vec3(0.23125,0.23125,0.23125   ), vec3(0.2775,0.2775,0.2775      ), vec3(0.773911,0.773911,0.773911   ), 89.6, 0.5, 0.7},
-  {/*"Turquoise",       9*/ vec3(0.1, 0.18725, 0.1745      ), vec3(0.396, 0.74151, 0.69102   ), vec3(0.297254, 0.30829, 0.306678  ), 12.8, 0.5, 0.7},
-  {/*"Ruby",           10*/ vec3(0.1745, 0.01175, 0.01175  ), vec3(0.61424, 0.04136, 0.04136 ), vec3(0.727811, 0.626959, 0.626959 ), 76.8, 0.5, 0.7},
-  {/*"Polished Gold",  11*/ vec3(0.24725, 0.2245, 0.0645   ), vec3(0.34615, 0.3143, 0.0903   ), vec3(0.797357, 0.723991, 0.208006 ), 83.2, 0.5, 0.7},
-  {/*"Polished Bronze",12*/ vec3(0.25, 0.148, 0.06475      ), vec3(0.4, 0.2368, 0.1036       ), vec3(0.774597, 0.458561, 0.200621 ), 76.8, 0.5, 0.7},
-  {/*"Polished Copper",13*/ vec3(0.2295, 0.08825, 0.0275   ), vec3(0.5508, 0.2118, 0.066     ), vec3(0.580594, 0.223257, 0.0695701), 51.2, 0.5, 0.7},
-  {/*"Jade",           14*/ vec3(0.135, 0.2225, 0.1575     ), vec3(0.135, 0.2225, 0.1575     ), vec3(0.316228, 0.316228, 0.316228 ), 12.8, 0.5, 0.7},
-  {/*"Obsidian",       15*/ vec3(0.05375, 0.05, 0.06625    ), vec3(0.18275, 0.17, 0.22525    ), vec3(0.332741, 0.328634, 0.346435 ), 38.4, 0.5, 0.7},
-  {/*"Pearl",          16*/ vec3(0.05, 0.020725, 0.020725    ), vec3(1.0, 0.829, 0.829         ), vec3(0.1, 0.1, 0.1 ), 1.2, 1, 1},
-  {/*"Emerald",        17*/ vec3(0.0215, 0.1745, 0.0215    ), vec3(0.07568, 0.61424, 0.07568 ), vec3(0.033, 0.127811, 0.133       ), 6.8, 0.5, 0.7},
-  {/*"Black Plastic",  18*/ vec3(0.0, 0.0, 0.0             ), vec3(0.01, 0.01, 0.01          ), vec3(0.5, 0.5, 0.5                ), 32.0, 0.5, 0.7},
-  {/*"Black Rubber",   19*/ vec3(0.02, 0.02, 0.02          ), vec3(0.01, 0.01, 0.01          ), vec3(0.4, 0.4, 0.4                ), 10.0, 0.5, 0.7},
-  {/*"White",          20*/ vec3(0.02, 0.02, 0.02          ), vec3(1, 1, 1          ),          vec3(0.1, 0.1, 0.1                ), 10.0, 0.5, 0.7},
-  {/*"Pearl",          21*/ vec3(0.25, 0.020725, 0.20725  ), vec3(1.0, 0.829, 0.829         ), vec3(0.1, 0.1, 0.1                ), 1.2, 1, 1},
-  {/*"Emerald",        22*/ vec3(0.0215, 0.1745, 0.0215    ), vec3(0.61424, 0.07568, 0.07568 ), vec3(0.033, 0.127811, 0.133       ), 6.8, 0.5, 0.7},
-};
-
-
 struct ray
 {
-  vec3 Org;
   vec3 Dir;
-};
-
-struct envi
-{
-  float RefractionCoef;
-  float DecayCoef;
-};
-
-struct intr
-{
-  float T;
-  vec3 P;
-  vec3 N;
-  surface Mtl;
+  vec3 Org;
+  vec3 Color;
+  float n, Weight, Kr;
+  bool IsSky, IsInObj;
 };
 
 struct light_info
@@ -116,41 +75,30 @@ struct spot_light
   vec3 Dir;   // Spot direction 
   vec3 Color; // Light color 
   float A1, A2; 
-}; 
-
-struct shape
-{
-  int shape_type;
-  int shape_id;
 };
 
-struct shapeop
+struct surface
 {
-  shape shape;
-  int modify;
-  int op_type;
-  int next;
+  vec3 Albedo;
+  float roughness, metallic;
 };
 
 struct sphere
 {
   vec3 C;
-  float R;
-  surface Mtl;
+  float R;         
 };
 
 struct box
 {
   vec3 C;
-  vec3 R;
-  surface Mtl;
+  vec3 R;     
 };
 
 struct plane
 {
   vec3 N;
   float D;
-  surface Mtl;
 };
 
 struct torus
@@ -158,14 +106,12 @@ struct torus
   vec3 C;
   vec3 N;
   float k1, k2;
-  surface Mtl;
 };
 
 struct ellipsoid 
 { 
   vec3 C; 
-  vec3 R; 
-  surface Mtl; 
+  vec3 R;     
 }; 
 
 struct cylinder
@@ -173,27 +119,33 @@ struct cylinder
   vec3 P1;
   float R1;
   vec3 P2;
-  float R2;
-  surface Mtl;
+  float R2;   
 };
 
 struct capsule 
 { 
   vec3 P1; 
   vec3 P2; 
-  float R; 
-  surface Mtl; 
+  float R;     
 }; 
 
 struct hollow_sphere
 {
   vec3 C;
-  float r, h, t;
-  surface Mtl;
+  float r, h, t; 
 };
 
+const surface MtlLib[] = {
+  {vec3(0.5, 0.5, 0.0), 0.5, 0.7},
+  {vec3(0.9, 0.1, 0.3), 0.3, 0.8},
+};
+
+
 const float PI = 3.14159;
-bool IsSky = false;
+const bool IsSkybox = true;
+const bool IsReflection = true;
+const bool IsShadows = true;
+const bool IsAO = false;    
 
 float D2R( float Degree )
 {
@@ -226,10 +178,16 @@ ray SetRay( float Sx, float Sy )
 
   vec3 A = Dir * ProjDist;
   vec3 B = Right * (Sx - FrameW / 2) * Wp / FrameW;
-  vec3 C = Up * (-Sy + FrameH / 2) * Hp / FrameH;
+  vec3 C = cross(Right, Dir) * (-Sy + FrameH / 2) * Hp / FrameH;
   vec3 X = (A + B) + C;
   Ray.Org = Loc + X;
   Ray.Dir = normalize(X);
+  Ray.Color = vec3(0);
+  Ray.n = 1;
+  Ray.Weight = 1;
+  Ray.IsSky = false;
+  Ray.IsInObj = true;
+  Ray.Kr = 1;
 
   return Ray;
 }
@@ -239,38 +197,65 @@ vec3 RayApply( ray R, float T )
   return R.Org + R.Dir * T;
 }
 
-
-
-float SDFSphere( vec3 P, sphere S )
+vec3 Gamma( vec3 Color, float g )
 {
+  return vec3(pow(Color.x, g), pow(Color.y, g), pow(Color.z, g));
+}
+
+float SDFSphere( vec3 P, sphere S, out vec2 TexCoord )
+{
+  TexCoord = vec2(1 - atan((P.z - S.C.z) / S.R, (P.x - S.C.x) / S.R) / PI, acos((P.y - S.C.y) / S.R));
   return length(P - S.C) - S.R;
 }
 
-float SDFBox( vec3 P, box B )
+float SDFBox( vec3 P, box B, out vec2 TexCoord )
 {
   vec3 d = abs(P - B.C) - B.R;
+  TexCoord = vec2(0);
+  
+  if (abs(P.z + B.R.z - B.C.z) < Threshold || abs(P.z - B.R.z - B.C.z) < Threshold)
+    TexCoord = vec2(P.x - B.C.x, -P.y + B.C.y) / 4;
+  else if (abs(P.x + B.R.x - B.C.x) < Threshold || abs(P.x - B.R.x - B.C.x) < Threshold)
+    TexCoord = vec2(P.z - B.C.z, -P.y + B.C.y) / 4;
+  else if (abs(P.y + B.R.y - B.C.y) < Threshold || abs(P.y - B.R.y - B.C.y) < Threshold)
+    TexCoord = vec2(P.x - B.C.x, P.z - B.C.z) / 4;
 
   return min(max(d.x, max(d.y,d.z)), 0.0) + length(max(d, 0.0));
 }
 
-float SDFPlane( vec3 P, plane Pl )
+float SDFPlane( vec3 P, plane Pl, out vec2 TexCoord )
 {
+  TexCoord = vec2(0);
+  vec3 N2, N3;
+                    
+  if (Pl.N.x == 1)
+    N2 = vec3(0, 0, 1);
+  else
+    N2 = vec3(1, 0, 0);
+  N3 = normalize(cross(Pl.N, N2));
+  N2 = normalize(cross(N3, Pl.N));
+  TexCoord = vec2(dot(P - Pl.N * Pl.D, N2) / 4, -dot(P - Pl.N * Pl.D, N3) / 4);
+
   return dot(P, Pl.N) - Pl.D;
 }
 
-float SDFTorus( vec3 P, torus T ) 
+float SDFTorus( vec3 P, torus T, out vec2 TexCoord ) 
 {
+  TexCoord = vec2(0);
   return distance(P, T.C + T.k1 * normalize(cross(cross(T.N, (P - T.C)), T.N))) - T.k2;
 }
 
-float SDFEllipsoid( vec3 P, ellipsoid E ) 
+float SDFEllipsoid( vec3 P, ellipsoid E, out vec2 TexCoord ) 
 { 
   float k0 = length((P - E.C) / E.R); 
   float k1 = length((P - E.C) / (E.R * E.R)); 
+
+  TexCoord = vec2(0);
+
   return k0 * (k0 - 1.0) / k1; 
 }
 
-float SDFCylinder( vec3 P, cylinder C )
+float SDFCylinder( vec3 P, cylinder C, out vec2 TexCoord )
 {
   float rba  = C.R2 - C.R1;
   float baba = dot(C.P2 - C.P1, C.P2 - C.P1);
@@ -284,15 +269,20 @@ float SDFCylinder( vec3 P, cylinder C )
   float cbx = x - C.R1 - f * rba;
   float cby = paba - f;
   float s = (cbx < 0.0 && cay < 0.0) ? -1.0 : 1.0;
-  return s*sqrt(min(cax * cax + cay * cay * baba,
-                    cbx * cbx + cby * cby * baba));
+
+  TexCoord = vec2(0);
+
+  return s * sqrt(min(cax * cax + cay * cay * baba,
+                      cbx * cbx + cby * cby * baba));
 }
 
-float SDFCapsule( vec3 P, capsule C ) 
+float SDFCapsule( vec3 P, capsule C, out vec2 TexCoord ) 
 { 
   vec3 pa = P - C.P1, ba = C.P2 - C.P1; 
   float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0); 
    
+  TexCoord = vec2(0);
+
   return length(pa - ba * h) - C.R; 
 }
 
@@ -307,39 +297,6 @@ float SDFCutHollowSphere( vec3 P, hollow_sphere hs )
   vec2 q = vec2(length(P.xz), P.y);
   return ((hs.h * q.x < w * q.y) ? length(q - vec2(w, hs.h)) : 
                                    abs(length(q) - hs.r)) - hs.t;
-}
-
-float SDFSeaHelp( vec2 uv, float Choppy )
-{
-  uv += Noise(uv);        
-  vec2 wv = 1.0 - abs(sin(uv));
-  vec2 swv = abs(cos(uv));    
-  wv = mix(wv, swv, wv);
-  return pow(1.0 - pow(wv.x * wv.y, 0.65), Choppy);
-}
-
-float SDFSea( vec3 P )
-{
-  float freq = 0.16;
-  float amp = 0.6;
-  float choppy = 4;
-  vec2 uv = P.xz; 
-  uv.x *= 0.75;
-
-  float d, h = 0.0;
-
-  for (int i = 0; i < 3; i++)
-  {
-    d = SDFSeaHelp((uv + Time) * freq, choppy);
-    d += SDFSeaHelp((uv - Time) * freq, choppy);
-    h += d * amp;        
-    uv *= mat2(1.6, 1.2, -1.2, 1.6);
-    freq *= 1.9;
-    amp *= 0.22;
-    choppy = mix(choppy, 1.0, 0.2);
-  }
-
-  return P.y - h;
 }
 
 float SDFUnion( float a, float b )
@@ -357,31 +314,30 @@ float SDFDifer( float a, float b )
   return max(a, -b);
 }
  
-float SDFUnionSmooth(float distA, float distB, float k )
+float SDFUnionSmooth( float distA, float distB, float k )
 {
-  float h = clamp(0.5 + 0.5*(distA-distB)/k, 0., 1.);
-  return mix(distA, distB, h) - k*h*(1.-h); 
+  float h = clamp(0.5 + 0.5 * (distA - distB) / k, 0., 1.);
+  return mix(distA, distB, h) - k * h * (1. - h); 
 }
 
-float SDFInterSmooth(float distA, float distB, float k ) 
+float SDFInterSmooth( float distA, float distB, float k ) 
 {
-  float h = clamp(0.5 - 0.5*(distA-distB)/k, 0., 1.);
-  return mix(distA, distB, h ) + k*h*(1.-h); 
+  float h = clamp(0.5 - 0.5 * (distA - distB) / k, 0., 1.);
+  return mix(distA, distB, h ) + k * h * (1. - h); 
 }
  
-float SDFDiferSmooth(float distA, float distB, float k)
+float SDFDiferSmooth( float distA, float distB, float k )
 {
-  float h = clamp(0.5 - 0.5*(distB+distA)/k, 0., 1.);
-  return mix(distA, -distB, h ) + k*h*(1.-h); 
+  float h = clamp(0.5 - 0.5 * (distB + distA) / k, 0., 1.);
+  return mix(distA, -distB, h) + k * h * (1. - h); 
 }
 
 surface SDFSurfaceSmoothUnion( float k1, surface surface1, float k2, in surface surface2, float smoothness )
 {
   float interpolation = clamp(0.5 + 0.5 * (k1 - k2) / smoothness, 0.0, 1.0);
-  return surface(mix(surface2.Ka, surface1.Ka, 1 - interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-                 mix(surface2.Kd, surface1.Kd, 1 - interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-                 mix(surface2.Ks, surface1.Ks, 1 - interpolation),// - smoothness * interpolation * (1.0 - interpolation);
-                 mix(surface2.Ph, surface1.Ph, 1 - interpolation), 0, 0);// - smoothness * interpolation * (1.0 - interpolation);
+  return surface(mix(surface2.Albedo, surface1.Albedo, 1 - interpolation),
+                 mix(surface2.roughness, surface1.roughness, 1 - interpolation),
+                 mix(surface2.metallic, surface1.metallic, 1 - interpolation));
 }
 
 mat4 MatrRotate( float d, vec3 a )
@@ -416,8 +372,29 @@ vec3 Replication( vec3 c, vec3 p )
 
 float SceneSDF( in vec3 point, inout surface mtl )
 {
-float res = 0, tmp;
-surface tmp_mtl;         
+  /* vec2 TC1, TC2, TC3;
+  float a = SDFSphere(point, sphere(vec3(0, 2, -3), 1), TC1),
+    b = SDFPlane(point, plane(vec3(0, 1, 0), -1), TC2),
+    c = SDFBox(point, box(vec3(0), vec3(1)), TC3),
+    res = SDFUnion(a, c);
+
+  /* if (res == c)
+  {
+    vec3 Albedo = texture(Tex1, TC3).bgr;
+    
+  }
+  else
+  {
+    vec3 Albedo = texture(Tex1, TC1).bgr;
+    mtl = surface(Albedo, 0.3, 0.5 + 0.4 * sin(Time));
+  } */
+
+ /*  mtl = surface(vec3(0.662, 0.655, 0.634), 0, 1);
+
+  return res; */
+
+float res = HUGE_VAL, tmp;
+surface tmp_mtl;
 
 SCENE
 
@@ -440,28 +417,17 @@ vec3 SDFSceneNormal( vec3 P )
   return normalize(vec3(a - b, c - d, e - f));
 }
 
-float SphereTracing( ray R, float MaxDist, inout intr Intr )
+LIGHT
+
+vec3 SkyboxColor( void )
 {
-  float t = 0;
-  float io;
-  
-  while (t < MaxDist)
-  {
-    io = SceneSDF(RayApply(R, t), Intr.Mtl);
+  vec2 ScreenCoords = vec2(DrawTexCoord.x - 0.5, DrawTexCoord.y - 0.5);
+  ScreenCoords *= vec2(clamp(FrameH / FrameW, 0.47, 1.0), clamp(FrameW / FrameH, 0.47, 1.0));
+  ScreenCoords *= 1.8;
 
-    if (io <= Threshold)
-    {
-      Intr.T = t;
-      Intr.P = RayApply(R, t);
-      Intr.N = SDFSceneNormal(RayApply(R, t));
+  vec3 SkyDir = normalize(Dir) + normalize(Right) * ScreenCoords.x + normalize(cross(Right, Dir)) * ScreenCoords.y;
 
-      return t;
-    }
-
-    t += io;
-  }
-
-  return HUGE_VAL;
+  return texture(skybox, normalize(SkyDir)).bgr;
 }
 
 float ShadowPoint( inout light_info Li, point_light Lgt, vec3 P )
@@ -500,12 +466,88 @@ float ShadowSpot( inout light_info Li, spot_light Lgt, vec3 P )
   Li.Color = Lgt.Color; 
   Li.Dist = Dist; 
   return min(att, 1);  
-} 
+}
 
-LIGHT
+vec3 fresnelSchlick( float cosTheta, vec3 F0 )
+{
+  return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
 
-const envi Air = envi(1, 0);
-ray RRay;
+float DistributionGGX( vec3 N, vec3 H, float roughness )
+{
+  float a      = roughness * roughness;
+  float a2     = a * a;
+  float NdotH  = max(dot(N, H), 0.0);
+  float NdotH2 = NdotH * NdotH;
+	
+  float num   = a2;
+  float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+  denom = PI * denom * denom;
+	
+  return num / denom;
+}
+
+float GeometrySchlickGGX( float NdotV, float roughness )
+{
+  float r = (roughness + 1.0);
+  float k = (r * r) / 8.0;
+
+  float num   = NdotV;
+  float denom = NdotV * (1.0 - k) + k;
+	
+  return num / denom;
+}
+
+float GeometrySmith( vec3 N, vec3 V, vec3 L, float roughness )
+{
+  float NdotV = max(dot(N, V), 0.0);
+  float NdotL = max(dot(N, L), 0.0);
+  float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+  float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+  return ggx1 * ggx2;
+}
+
+vec3 BRDF( vec3 n, vec3 l, vec3 v, float ao, float att, surface Mtl )
+{
+  vec3 F0 = vec3(0.04); 
+  F0 = mix(F0, Mtl.Albedo, Mtl.metallic);
+
+  vec3 h = normalize(v + l);
+  float NDF = DistributionGGX(n, h, Mtl.roughness);        
+  float G   = GeometrySmith(n, v, l, Mtl.roughness);      
+  vec3 F    = fresnelSchlick(max(dot(h, v), 0.0), F0);       
+  
+  vec3 kS = F;
+  vec3 kD = vec3(1.0) - kS;
+  kD *= 1.0 - Mtl.metallic;	  
+  
+  vec3 numerator    = NDF * G * F;
+  float denominator = 4.0 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0) + Threshold;
+  vec3 specular     = numerator / denominator;  
+      
+  // add to outgoing radiance Lo
+  float NdotL = max(dot(n, l), 0.0);                
+  vec3 Lo = (kD * Mtl.Albedo / PI + specular) * NdotL;      
+
+  vec3 ambient = vec3(0.03) * Mtl.Albedo * ao;
+  vec3 color = ambient + Lo * att;
+	
+  color = color / (color + vec3(1.0));
+  color = pow(color, vec3(1.0 / 2.2));
+
+  return color;
+}
+
+vec3 Tonemap_ACES( const vec3 x )
+{  
+  const float a = 2.51;
+  const float b = 0.03;
+  const float c = 2.43;
+  const float d = 0.59;
+  const float e = 0.14;
+  return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
 
 float calcAO( vec3 P, vec3 N )
 {
@@ -523,7 +565,26 @@ float calcAO( vec3 P, vec3 N )
     if (occ > 0.35)
       break;
   }
+
   return clamp(1.0 - 3.0 * occ, 0.0, 1.0) * (0.5 + 0.5 * N.y);
+}
+
+float HardShadow( in ray R, float Min, float Max )
+{                 
+  surface Mtl;
+
+  for (float t = Min; t < Max;)
+  {   
+    float io = SceneSDF(RayApply(R, t), Mtl);
+    float h = io;
+   
+    if (abs(h) < 0.001)
+      return 0.65;
+    
+    t += h;
+  } 
+
+  return 1;
 }
 
 float SoftShadow( in ray R, float Min, float Max, float k )
@@ -538,7 +599,7 @@ float SoftShadow( in ray R, float Min, float Max, float k )
     float h = io;
    
     if (h < 0.001)
-      return 0.5;
+      return 0.65;
 
     float y = h * h / (2.0 * ph);
     float d = sqrt(h * h - y * y);
@@ -547,132 +608,135 @@ float SoftShadow( in ray R, float Min, float Max, float k )
     t += h;
   } 
 
-  return min(res + 0.5, 1);
+  return clamp(res, 0.65, 1);
 }
 
-float HardShadow( in ray R, float Min, float Max )
-{                 
-  surface Mtl;
-
-  for (float t = Min; t < Max;)
-  {   
-    float io = SceneSDF(RayApply(R, t), Mtl);
-    float h = io;
-   
-    if (h < 0.001)
-      return 0.5;
-    
-    t += h;
-  } 
-
-  return 1;
-}
-
-vec3 Shade( const vec3 Dir, const envi Media, intr I, float Weight )
-{
-  vec3 Color = vec3(0);
-  float att;
-  light_info li;
-  intr Intr;
-  int i = 0;
-  
-  vec3 R = reflect(Dir, I.N);
-  vec3 N = faceforward(I.N, Dir, I.N);
-
-  if (IsPointLgt)
-    for (i = 0; i < PointLgtCnt; i++)
-    { 
-      att = ShadowPoint(li, PointLgt[i], I.P);
-
-      float nl = max(dot(I.N, li.L), 0.0);
-      float rl = max(dot(R, li.L), 0.0);
-
-      Color += (li.Color * I.Mtl.Kd * nl + I.Mtl.Ks * li.Color * pow(rl, I.Mtl.Ph) * rl) * att;// * calcAO(I.P, I.N);
-
-      ray Shadow = ray(I.P + li.L * 0.1, li.L);    
-      //Color *= SoftShadow(Shadow, 0, 100, 4);
-      Color *= HardShadow(Shadow, 0, 100);
-    }
-
-  if (IsDirLgt)
-    for (i = 0; i < DirLgtCnt; i++)
-    { 
-      att = ShadowDir(li, DirLgt[i], I.P);
-
-      float nl = max(dot(I.N, li.L), 0.0);
-      float rl = max(dot(R, li.L), 0.0);
-
-      Color += (li.Color * I.Mtl.Kd * nl + I.Mtl.Ks * li.Color * pow(rl, I.Mtl.Ph) * rl) * att * calcAO(I.P, I.N);
-
-      ray Shadow = ray(I.P + li.L * 0.1, li.L);
-      //Color *= SoftShadow(Shadow, 0, 100, 4);
-      Color *= HardShadow(Shadow, 0, 100);
-    }
-
-  if (IsSpotLgt)
-    for (i = 0; i < SpotLgtCnt; i++)
-    { 
-      att = ShadowSpot(li, SpotLgt[i], I.P);
-
-      float nl = max(dot(I.N, li.L), 0.0);
-      float rl = max(dot(R, li.L), 0.0);
-
-      Color += (li.Color * I.Mtl.Kd * nl + I.Mtl.Ks * li.Color * pow(rl, I.Mtl.Ph) * rl) * att * calcAO(I.P, I.N);
-
-      ray Shadow = ray(I.P + li.L * 0.1, li.L);    
-      //Color *= SoftShadow(Shadow, 0, 100, 4);
-      Color *= HardShadow(Shadow, 0, 100);
-    }
-
-  float eta1 = Media.RefractionCoef, eta2 = Media.RefractionCoef;
-  vec3 T = (-N * dot(N, Dir) + Dir) * eta2 / eta1 -
-    N * sqrt(1 - (1 - dot(N, Dir) * dot(N, Dir)) * eta2 * eta2 / (eta1 * eta1));
-
-  RRay = ray(I.P + R * Threshold, R);
-  
-  return Color * Weight * 3;
-}
-
-vec3 Sky( vec3 e )
-{
-  e.y = (max(e.y, 0.0) * 0.8 + 0.2) * 0.8;
-  return vec3(pow(1.0 - e.y, 2.0), 1.0 - e.y, 0.6 + (1.0 - e.y) * 0.4) * 1.1;
-}
-
-vec3 Trace( ray Ray, const envi Media, float Weight )
+vec3 Shade( inout ray R, vec3 P, vec3 N, surface Mtl )
 {
   vec3 color = vec3(0);
-  intr Intr;
-  int i = 0;
-  float a = SphereTracing(Ray, 100, Intr);
+  float AO;
 
-  if (a != 0)
+  if (IsPointLgt)
   {
-    color = Shade(Ray.Dir, Media, Intr, Weight);
-    color *= exp(-Intr.T * Media.DecayCoef);
+    AO = mix(float(IsAO), 0.8, calcAO(P, N));
+
+    for (int i = 0; i < PointLgtCnt; i++)
+    {
+      light_info li;
+
+      float att = ShadowPoint(li, PointLgt[i], P);
+
+      if (IsShadows)
+      {
+        ray Shadow;
+        Shadow.Org = P + li.L * 0.1;
+        Shadow.Dir = li.L;
+      
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+      }
+      else
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+    }
   }
-  
-  return color;
+
+  if (IsDirLgt)
+  {
+    AO = mix(float(IsAO && !IsPointLgt), 0.8, calcAO(P, N));
+
+    for (int i = 0; i < DirLgtCnt; i++)
+    {
+      light_info li;
+
+      float att = ShadowDir(li, DirLgt[i], P);
+
+      if (IsShadows)
+      {
+        ray Shadow;
+        Shadow.Org = P + li.L * 0.1;
+        Shadow.Dir = li.L;
+      
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+      }
+      else
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+    }
+  }
+
+  if (IsSpotLgt)
+  {
+    AO = mix(float(IsAO && !IsPointLgt && !IsDirLgt), 0.8, calcAO(P, N));
+
+    for (int i = 0; i < SpotLgtCnt; i++)
+    {
+      light_info li;
+
+      float att = ShadowSpot(li, SpotLgt[i], P);
+
+      if (IsShadows)
+      {
+        ray Shadow;
+        Shadow.Org = P + li.L * 0.1;
+        Shadow.Dir = li.L;
+      
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+      }
+      else
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+    }
+  }
+
+  vec3 Ref = reflect(R.Dir, N);
+  R.Org = P + Ref * Threshold;
+  R.Dir = Ref;
+
+  return Tonemap_ACES(color);
+}
+
+void SphereTracing( inout ray R, float MaxDist )
+{
+  float t = 0;
+  float io;
+  surface Mtl;
+
+  while (t < MaxDist)
+  {
+    io = SceneSDF(RayApply(R, t), Mtl);
+
+    if (abs(io) <= Threshold)
+    { 
+      vec3 P = RayApply(R, t);
+      vec3 N = SDFSceneNormal(P);
+      R.Color += Shade(R, P, N, Mtl) * R.Weight;
+      R.Kr = Mtl.metallic;
+      R.Weight *= 0.5;
+      return;
+    }
+
+    t += io;
+  }
+
+  R.IsSky = true;
+  R.Color += texture(skybox, normalize(R.Dir)).bgr * R.Weight * float(IsSkybox);
+}
+
+vec3 Render( void )
+{
+  int RI_cnt = 1 + int(IsReflection);
+  ray R = SetRay(DrawTexCoord.x * FrameW + 0.5, (1 - DrawTexCoord.y) * FrameH - 0.5);
+
+  SphereTracing(R, 100);
+
+  for (int i = 0; i < RI_cnt - 1; i++)
+  {
+    if (R.IsSky)
+      break;
+    SphereTracing(R, 100);
+  }
+
+  return R.Color;
 }
 
 void main( void )
-{
-  int RI_cnt = 2, i;
-  vec3 Res = vec3(0);
-  
-  //for (i = 0; i < RI_cnt; i++)
-  //{
-  //  if (i == 0)
-  //  {
-  //    ray R = SetRay(DrawTexCoord.x * FrameW + 0.5, (1 - DrawTexCoord.y) * FrameH - 0.5);
-  //    Res = Trace(R, Air, 7.5);
-  //  }
-  //  else
-  //    Res += Trace(RRay, Air, 1 / float(i + 1) * 1.2);
-  //}
-  
-  ray R = SetRay(DrawTexCoord.x * FrameW + 0.5, (1 - DrawTexCoord.y) * FrameH - 0.5);
-  Res = Trace(R, Air, 7.5);
-
-  OutColor = vec4(Res, 1);
+{ 
+  OutColor = vec4(Render(), 1);
 }

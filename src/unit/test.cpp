@@ -25,14 +25,18 @@ namespace trm
   {
   private:
     primitive* FullScreen;
+    texture *Skybox;
   public:
     test_unit( animation* Ani )
     {
       material* M = Ani->AddMaterial("RT", "RT");
       FullScreen = Ani->CreatePrim(topology::base<vertex::point>(prim_type::POINTS, { vertex::point(vec3(0)) }), M);
+      Skybox = new texture();
+      Skybox->LoadCube("skyboxes/SkyLight", 0);
     }
     ~test_unit( VOID )
     {
+      delete Skybox;
       trm::animation::GetPtr()->Free(FullScreen);
     }
     VOID Response( animation *Ani ) override
@@ -54,6 +58,14 @@ namespace trm
           if ((loc = glGetUniformLocation(FullScreen->Material->Shader->GetPrgId(), tname)) != -1)
             glUniform1i(loc, val);
         }
+      }
+
+      if (Skybox != nullptr)
+      {
+        /* Activate sampler */
+        glActiveTexture(GL_TEXTURE0);
+        /* Bind texture to sampler */
+        glBindTexture(GL_TEXTURE_CUBE_MAP, Skybox->GetId());
       }
     }
     VOID Render( animation *Ani ) override

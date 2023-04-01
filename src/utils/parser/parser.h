@@ -71,7 +71,8 @@ namespace parser
       Consume(token_type::eWord); // name
       token ext = Get(0);
       Consume(token_type::eWord); // ext
-      if (ext.Text != "png" && ext.Text != "jpg" && ext.Text != "tga" && ext.Text != "bmp")
+      if (ext.Text != "png" && ext.Text != "jpg" && ext.Text != "tga" && ext.Text != "bmp" && 
+          ext.Text != "g32" && ext.Text != "g24")
         throw std::exception("incorrect texture extension!");
       Consume(token_type::eCav);  // "
     }
@@ -682,6 +683,8 @@ namespace parser
 
   void Parse(const std::string &Scene, const std::string &ShIn, const std::string &ShOut )
   {
+    obj::shape::ClearTextures();
+
     std::string F = file::ReadFile(Scene);
 
     lexer L(F);
