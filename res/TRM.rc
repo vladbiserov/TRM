@@ -92,15 +92,6 @@ BEGIN
         MENUITEM "&Exit\tEsc",                  ID_FILE_EXIT
     END
     MENUITEM "Current scene name",          ID_CURRENTSCENENAME, GRAYED
-    POPUP "&Capture"
-    BEGIN
-        MENUITEM "&Take shot\tF1",              ID_TAKE_TAKESHOT
-        POPUP "&Take video"
-        BEGIN
-            MENUITEM "&Start\tF2",                  ID_TAKEVIDEO_START
-            MENUITEM "&End\tF2",                    ID_TAKEVIDEO_END, INACTIVE
-        END
-    END
     MENUITEM "&About",                      ID_ABOUT
 END
 

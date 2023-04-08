@@ -7,7 +7,7 @@
   * PURPOSE     : Ray marching project.
   *               Parser module.
   * PROGRAMMER  : Vladislav Biserov.
-  * LAST UPDATE : 30.03.2023
+  * LAST UPDATE : 08.04.2023
   * NOTE        : None.
   *
   * No part of this file may be changed without agreement of
@@ -71,7 +71,8 @@ namespace parser
         eCapsule,
         ePlane,
         eTorus,
-        eEllipsoid
+        eEllipsoid,
+        eWater
       };
 
       static const std::map<std::string, type> Table;

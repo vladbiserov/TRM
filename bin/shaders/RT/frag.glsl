@@ -174,7 +174,7 @@ float Noise( vec2 P )
   vec2 f = fract(P);	
   vec2 u = f * f * (3.0 - 2.0 * f);
 
-  return -1.0 + 2.0 * mix(mix(Hash(i + vec2(0.0, 0.0)), Hash(i + vec2(1.0, 0.0)), u.x), mix(Hash(i + vec2(0.0, 1.0)), Hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  return -1.0 + 2.0 * f;//mix(mix(Hash(i + vec2(0.0, 0.0)), Hash(i + vec2(1.0, 0.0)), u.x), mix(Hash(i + vec2(0.0, 1.0)), Hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
 ray SetRay( float Sx, float Sy )
@@ -302,7 +302,7 @@ float SDFCutHollowSphere( vec3 P, hollow_sphere hs )
   vec2 q = vec2(length(P.xz), P.y);
   return ((hs.h * q.x < w * q.y) ? length(q - vec2(w, hs.h)) : 
                                    abs(length(q) - hs.r)) - hs.t;
-}
+}           
 
 float SDFUnion( float a, float b )
 {
@@ -376,31 +376,9 @@ vec3 Replication( vec3 c, vec3 p )
 }
 
 float SceneSDF( in vec3 point, inout mtl Mtl )
-{
-  /* vec2 TC1, TC2, TC3;
-  float a = SDFSphere(point, sphere(vec3(0, 2, -3), 1), TC1),
-    b = SDFPlane(point, plane(vec3(0, 1, 0), -1), TC2),
-    c = SDFBox(point, box(vec3(0), vec3(1)), TC3),
-    res = SDFUnion(a, c);
+{                                             
+float res, tmp;
 
-  /* if (res == c)
-  {
-    vec3 Albedo = texture(Tex1, TC3).bgr;
-    
-  }
-  else
-  {
-    vec3 Albedo = texture(Tex1, TC1).bgr;
-    Mtl = mtl(Albedo, 0.3, 0.5 + 0.4 * sin(Time));
-  } */
-
- /*  Mtl = mtl(vec3(0.662, 0.655, 0.634), 0, 1);
-
-  return res; */
-
-mtl m = {vec3(0), 1, 2};
-
-float res = HUGE_VAL, tmp;
 mtl tmp_mtl;
 
 // add shape 'a2'
@@ -427,6 +405,11 @@ mtl_a2.Albedo = texture(Tex1, tex_a2).bgr;
 a = mtl(vec3(abs(sin((Time*5.500000))), 0.000000, abs(cos((Time*4.000000)))), 1.000000, 0.500000);
 
 // apply SDF function to 'a4'
+a4 = SDFBox(mod_a4, box(vec3(sin(Time)*8,abs(cos(Time))*8,0), vec3(2)), tex_a4);
+mtl_a4 = a;
+
+// apply modification function to 'a4'
+mod_a4 = Rotate(100, vec3(0,1,0), mod_a4);
 a4 = SDFBox(mod_a4, box(vec3(sin(Time)*8,abs(cos(Time))*8,0), vec3(2)), tex_a4);
 mtl_a4 = a;
 
@@ -664,18 +647,19 @@ float SoftShadow( in ray R, float Min, float Max, float k )
     t += h;
   } 
 
-  return clamp(res, 0.65, 1);
+  return clamp(res, 0.65, 1.0);
 }
 
 vec3 Shade( inout ray R, vec3 P, vec3 N, mtl Mtl )
 {
   vec3 color = vec3(0);
-  float AO;
+  float AO = 0.8;
+
+  if (IsAO)
+    AO = calcAO(P, N);
 
   if (IsPointLgt)
-  {
-    AO = mix(float(IsAO), 0.8, calcAO(P, N));
-
+  { 
     for (int i = 0; i < PointLgtCnt; i++)
     {
       light_info li;
@@ -688,17 +672,15 @@ vec3 Shade( inout ray R, vec3 P, vec3 N, mtl Mtl )
         Shadow.Org = P + li.L * 0.1;
         Shadow.Dir = li.L;
       
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100) * li.Color;
       }
       else
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * li.Color;
     }
   }
 
   if (IsDirLgt)
-  {
-    AO = mix(float(IsAO && !IsPointLgt), 0.8, calcAO(P, N));
-
+  { 
     for (int i = 0; i < DirLgtCnt; i++)
     {
       light_info li;
@@ -711,17 +693,15 @@ vec3 Shade( inout ray R, vec3 P, vec3 N, mtl Mtl )
         Shadow.Org = P + li.L * 0.1;
         Shadow.Dir = li.L;
       
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100) * li.Color;
       }
       else
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * li.Color;
     }
   }
 
   if (IsSpotLgt)
-  {
-    AO = mix(float(IsAO && !IsPointLgt && !IsDirLgt), 0.8, calcAO(P, N));
-
+  { 
     for (int i = 0; i < SpotLgtCnt; i++)
     {
       light_info li;
@@ -734,15 +714,15 @@ vec3 Shade( inout ray R, vec3 P, vec3 N, mtl Mtl )
         Shadow.Org = P + li.L * 0.1;
         Shadow.Dir = li.L;
       
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * HardShadow(Shadow, 0, 100) * li.Color;
       }
       else
-        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl);
+        color += BRDF(N, li.L, -R.Dir, AO, att, Mtl) * li.Color;
     }
   }
 
   vec3 Ref = reflect(R.Dir, N);
-  R.Org = P + Ref * Threshold;
+  R.Org = P + Ref * 0.01;
   R.Dir = Ref;
 
   return Tonemap_ACES(color);

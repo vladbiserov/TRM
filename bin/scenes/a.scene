@@ -14,6 +14,8 @@ light l = dir(vec3(0, 1, 1), vec3(1, 1, 1));
 mtl a = mtl(vec3(abs(sin(Time * 5.5)), 0, abs(cos(Time * 4))), 1, 0.5);
 shape a4 = box(vec3(sin(Time) * 8, abs(cos(Time)) * 8, 0), vec3(2), a);
 
+a4 = rotate(100, vec3(0, 1,0));
+
 //vec3 a = vec3(0);
 
 //shape a3 = capsule(vec3(0), vec3(0, 5, 0), 3, MtlLib[0]);

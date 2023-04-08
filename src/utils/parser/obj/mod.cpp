@@ -7,7 +7,7 @@
  * PURPOSE     : Ray marching project.
  *               Parser module.
  * PROGRAMMER  : Vladislav Biserov.
- * LAST UPDATE : 30.03.2023
+ * LAST UPDATE : 08.04.2023
  * NOTE        : None.
  *
  * No part of this file may be changed without agreement of
@@ -27,9 +27,9 @@ const std::map<std::string, parser::obj::mod::type> parser::obj::mod::Table =
 
 const std::map<parser::obj::mod::type, std::vector<parser::param::type>> parser::obj::mod::Types = 
 {
-  {parser::obj::mod::type::eRotate, {param::type::eNum, param::type::eVec, param::type::eShp}},
-  {parser::obj::mod::type::eTranslate, {param::type::eVec, param::type::eShp}},
-  {parser::obj::mod::type::eScale, {param::type::eVec, param::type::eShp}},
+  {parser::obj::mod::type::eRotate, {param::type::eNum, param::type::eVec}},
+  {parser::obj::mod::type::eTranslate, {param::type::eVec}},
+  {parser::obj::mod::type::eScale, {param::type::eVec}},
 };
 
 const std::map<parser::obj::mod::type, std::function<std::string(std::string, std::vector<std::string>)>> parser::obj::mod::ToStr
