@@ -16,17 +16,20 @@ shape a4 = box(vec3(sin(Time) * 8, abs(cos(Time)) * 8, 0), vec3(2), a);
 
 a4 = rotate(100, vec3(0, 1,0));
 
+shape am = water(0, 0.6, 3, a);
+
 //vec3 a = vec3(0);
 
 //shape a3 = capsule(vec3(0), vec3(0, 5, 0), 3, MtlLib[0]);
 
 //a4 = smth_union(a4, a2, 1);
 
-rm_shadow(false);
+//rm_shadow(false);
 rm_reflect(true);
 rm_skybox(true);
 
-add(a2, a4);
+//add(a2, a4);
 add(l);
+add(am);
 
-//rm_shadow(true);
+rm_shadow(true);

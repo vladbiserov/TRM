@@ -41,7 +41,7 @@ const std::map<parser::obj::shape::type, std::vector<parser::param::type>> parse
   {parser::obj::shape::type::eTorus, {param::type::eVec, param::type::eVec, param::type::eNum, param::type::eNum, param::type::eMat, param::type::eTex}},
   {parser::obj::shape::type::eCylinder, {param::type::eVec, param::type::eNum, param::type::eVec, param::type::eNum, param::type::eMat, param::type::eTex}},
   {parser::obj::shape::type::eCapsule, {param::type::eVec, param::type::eVec, param::type::eNum, param::type::eMat, param::type::eTex}},
-  {parser::obj::shape::type::eWater, {}},
+  {parser::obj::shape::type::eWater, {param::type::eNum, param::type::eNum, param::type::eNum, param::type::eMat}},
 };
 
 const std::map<parser::obj::shape::type, std::function<std::string(std::string, std::vector<std::string>, bool)>> parser::obj::shape::ToStr 
@@ -119,11 +119,7 @@ const std::map<parser::obj::shape::type, std::function<std::string(std::string, 
   { // Water
     parser::obj::shape::type::eWater, std::function([](std::string Var, std::vector<std::string> P, bool IsT) -> std::string
     {
-      std::string tex = "";
-      if (IsT)
-        tex = std::format("mtl_{0}.Albedo = texture(Tex{1}, tex_{0}).bgr;\n", Var, AddTex(P[4]));
-
-      return std::format("{0} = SDFCapsule(mod_{0}, capsule({1}, {2}, {3}), tex_{0});\nmtl_{0} = {4};\n", Var, P[0], P[1], P[2], P[3]) + tex;
+      return std::format("{0} = SDFSea(mod_{0}, sea({1}, {2}, {3}));\nmtl_{0} = {4};\n", Var, P[0], P[1], P[2], P[3]);
     })
   },
 };

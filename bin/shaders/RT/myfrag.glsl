@@ -135,6 +135,12 @@ struct hollow_sphere
   float r, h, t; 
 };
 
+struct sea
+{
+  float h, amp;
+  int n;
+};
+
 const mtl MtlLib[] = {
   {vec3(0.5, 0.5, 0.0), 0.5, 0.7},
   {vec3(0.9, 0.1, 0.3), 0.3, 0.8},
@@ -170,7 +176,7 @@ float Noise( vec2 P )
   vec2 f = fract(P);	
   vec2 u = f * f * (3.0 - 2.0 * f);
 
-  return -1.0 + 2.0 * f;//mix(mix(Hash(i + vec2(0.0, 0.0)), Hash(i + vec2(1.0, 0.0)), u.x), mix(Hash(i + vec2(0.0, 1.0)), Hash(i + vec2(1.0, 1.0)), u.x), u.y);
+  return -1.0 + 2.0 * mix(mix(Hash(i + vec2(0.0, 0.0)), Hash(i + vec2(1.0, 0.0)), u.x), mix(Hash(i + vec2(0.0, 1.0)), Hash(i + vec2(1.0, 1.0)), u.x), u.y);
 }
 
 ray SetRay( float Sx, float Sy )
@@ -300,6 +306,39 @@ float SDFCutHollowSphere( vec3 P, hollow_sphere hs )
                                    abs(length(q) - hs.r)) - hs.t;
 }           
 
+float SDFSeaHelp( vec2 uv, float Choppy )
+{
+  uv += Noise(uv);        
+  vec2 wv = 1.0 - abs(sin(uv));
+  vec2 swv = abs(cos(uv));    
+  wv = mix(wv, swv, wv);
+  return pow(1.0 - pow(wv.x * wv.y, 0.65), Choppy);
+}
+
+float SDFSea( vec3 P, sea S )
+{
+  float freq = 0.16;
+  float amp = S.amp;
+  float choppy = 4;
+  vec2 uv = P.xz; 
+  uv.x *= 0.75;
+
+  float d, h = S.h;
+
+  for (int i = 0; i < S.n; i++)
+  {
+    d = SDFSeaHelp((uv + Time) * freq, choppy);
+    d += SDFSeaHelp((uv - Time) * freq, choppy);
+    h += d * amp;        
+    uv *= mat2(1.6, 1.2, -1.2, 1.6);
+    freq *= 1.9;
+    amp *= 0.22;
+    choppy = mix(choppy, 1.0, 0.2);
+  }
+
+  return P.y - h;
+}
+
 float SDFUnion( float a, float b )
 {
   return min(a, b);
@@ -372,7 +411,7 @@ vec3 Replication( vec3 c, vec3 p )
 }
 
 float SceneSDF( in vec3 point, inout mtl Mtl )
-{                                             
+{ 
 float res, tmp;
 
 mtl tmp_mtl;
