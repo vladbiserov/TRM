@@ -1,0 +1,12 @@
+# Ignore visual studio tmp files
+.vs
+
+# Ignore compile folders
+Debug
+Release
+
+# Ignore all error files
+*.error
+
+# Ignore files related to user
+*.user
